@@ -1,7 +1,5 @@
 import { r, redirect, rs } from 'shared'
 import { createRouter, createWebHistory } from 'vue-router'
-import MobileLayout from './layouts/mobile-layout'
-import ArticleLayout from './layouts/article-layout'
 
 declare module 'vue-router' {
   interface RouteMeta {
