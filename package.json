@@ -10,6 +10,7 @@
     "prepare": "husky",
     "common": "pnpm --filter common",
     "app": "pnpm --filter web-app",
+    "webp": "node bin/webp.mjs",
     "config:sync": "find apps -mindepth 1 -maxdepth 1 -type d -exec mkdir -p {}/.vscode/ \\; -exec cp .vscode/*.json {}/.vscode/ \\;"
   },
   "keywords": [],

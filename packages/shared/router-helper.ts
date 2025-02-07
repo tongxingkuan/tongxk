@@ -92,11 +92,19 @@ export const r = newRoute
 export const newRouteWithComponents = (
   path: string,
   title: string,
-  components: Record<string, RouteComponent | (() => Promise<RouteComponent>)>,
+  _components: Record<string, SupportedComponent | SupportedLazyComponent>,
   children?: Array<RouteRecordRaw | RouteRecordRaw[]>,
 ) => {
   const name
     = path.replace(/^\//g, '').trim() || createStringId('route').toString()
+  const components = Object.fromEntries(
+    Object.entries(_components).map(([key, value]) => [
+      key,
+      isSupportedLazyComponent(value)
+        ? () => getComponent(value())
+        : getComponent(value),
+    ]),
+  )
   const currentRoute: RouteRecordRaw = {
     path,
     name,

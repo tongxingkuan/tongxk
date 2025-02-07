@@ -1,6 +1,6 @@
-import { r, rs } from 'shared'
+import { r, redirect, rs } from 'shared'
 import { createRouter, createWebHistory } from 'vue-router'
-import MainLayout from './layouts/mobile-layout'
+import MobileLayout from './layouts/mobile-layout'
 import ArticleLayout from './layouts/article-layout'
 
 declare module 'vue-router' {
@@ -10,15 +10,27 @@ declare module 'vue-router' {
 }
 
 export const routes = [
-  r('/', '', MainLayout, [
-    r('home', '首页', () => import('src/pages/home/home')),
+  redirect('/article', '/article/a1'),
+  r('/', '', [
+    () => import('src/pages/home/mobile-home-page'),
+    () => import('src/pages/home/home-page'),
   ]),
-  r('/', '', ArticleLayout, [
-    rs('article', '文章', {
-      top: () => import('src/pages/article/top'),
-      main: () => import('src/pages/article/article1'),
-    }),
-  ]),
+  r(
+    '/article',
+    '',
+    [
+      () => import('src/layouts/article-mobile-layout'),
+      () => import('src/layouts/article-layout'),
+    ],
+    [
+      rs('a1', '文章1', {
+        main: () => import('src/pages/article/article1-page'),
+      }),
+      rs('a2', '文章2', {
+        main: () => import('src/pages/article/article2-page'),
+      }),
+    ],
+  ),
 ]
 const router = createRouter({
   history: createWebHistory(),
