@@ -73,8 +73,8 @@ export const ArticleLayout = createComponent(null, () => {
   )
 
   return () => (
-    <div class="h-screen grid grid-cols-[auto_1fr] grid-rows-12 gap-3 grid-template-areas-top-left-main">
-      <div class="row-span-12 grid-area-left">
+    <div class="h-screen w-screen overflow-auto grid grid-cols-[auto_1fr] grid-rows-[40px_1fr] gap-3 grid-template-areas-top-left-main">
+      <div class="row-span-full grid-area-left">
         <NLayout has-sider class="h-full">
           <NLayoutSider
             bordered
@@ -101,9 +101,6 @@ export const ArticleLayout = createComponent(null, () => {
         </NLayout>
       </div>
       <div class="w-auto row-span-1 grid-area-top p-3">
-        <div class="text-2xl font-bold text-center">
-          Tongxk Love Suml forever
-        </div>
         <NBreadcrumb>
           {(menu.value as MenuOption[]).map(item => (
             <NBreadcrumbItem>
@@ -119,7 +116,7 @@ export const ArticleLayout = createComponent(null, () => {
           </NBreadcrumbItem>
         </NBreadcrumb>
       </div>
-      <div class="w-auto row-span-11 grid-area-main  bg-green-500">
+      <div class="w-auto row-span-11 grid-area-main p-3">
         <RouterView name="main">
           {{
             default: ({ Component }: RouterViewSlot) =>

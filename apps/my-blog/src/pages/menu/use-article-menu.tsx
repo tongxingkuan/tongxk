@@ -32,6 +32,12 @@ export const useMenu = () => {
           label: () => <RouterLink to="/article/a2">文章2</RouterLink>,
           labelText: '文章2',
         },
+        {
+          key: 'tsconfig',
+          path: ['/article/tsconfig'],
+          label: () => <RouterLink to="/article/tsconfig">tsconfig</RouterLink>,
+          labelText: 'tsconfig',
+        },
       ],
     },
   ])

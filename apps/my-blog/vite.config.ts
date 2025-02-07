@@ -4,6 +4,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import tailwindcss from '@tailwindcss/vite'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { plugin as mdPlugin, Mode } from 'vite-plugin-markdown'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -20,6 +21,7 @@ export default defineConfig({
       defineComponentName: ['defineComponent', 'createComponent'],
     }),
     tailwindcss(),
+    mdPlugin({ mode: [Mode.HTML, Mode.VUE] }),
   ],
   resolve: {
     alias: {

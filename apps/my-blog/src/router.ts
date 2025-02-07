@@ -27,6 +27,9 @@ export const routes = [
       rs('a2', '文章2', {
         main: () => import('src/pages/article/article2-page'),
       }),
+      rs('tsconfig', 'tsconfig', {
+        main: () => import('src/pages/article/tsconfig/tsconfig-page'),
+      }),
     ],
   ),
 ]
