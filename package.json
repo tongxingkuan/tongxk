@@ -1,0 +1,37 @@
+{
+  "name": "tongxk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "prepare": "husky",
+    "common": "pnpm --filter common",
+    "app": "pnpm --filter web-app",
+    "config:sync": "find apps -mindepth 1 -maxdepth 1 -type d -exec mkdir -p {}/.vscode/ \\; -exec cp .vscode/*.json {}/.vscode/ \\;"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@commitlint/cli": "^19.7.1",
+    "@commitlint/config-conventional": "^19.7.1",
+    "husky": "^9.1.7",
+    "imagemin": "^9.0.0",
+    "imagemin-webp": "^8.0.0",
+    "lint-staged": "^15.4.3",
+    "vue": "^3.2.37",
+    "preset": "workspace:*"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "**/*": "prettier --write --ignore-unknown"
+  },
+  "dependencies": {
+    "vue-router": "^4.5.0"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "preset",
+  "version": "1.0.0",
+  "description": "",
+  "main": "preset.mjs",
+  "exports": {
+    ".": "./preset.mjs"
+  },
+  "types": "./preset.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^3.0.1",
+    "@stylistic/eslint-plugin-jsx": "^3.0.0",
+    "eslint": "^9.19.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-json": "^4.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "eslint-plugin-vue": "^9.32.0",
+    "globals": "^15.14.0",
+    "typescript-eslint": "^8.23.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

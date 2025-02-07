@@ -1,0 +1,104 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    "**/*.log": true,
+    // 如果你需要查看这些目录，你可以用 VSCode 单独打开
+    // 如果你需要单独禁用某个目录，你 User Settings(JSON) 中添加 "files.exclude": { "apps/xxx": true }
+    "apps/skylink-*": true,
+    "apps/ui-showcase": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "eslint.format.enable": true,
+  "eslint.codeAction.showDocumentation": {
+    "enable": true
+  },
+  "eslint.quiet": true,
+  // Silent the stylistic rules in you IDE, but still auto fix them
+  "eslint.rules.customizations": [
+    {
+      "rule": "style/*",
+      "severity": "off"
+    },
+    {
+      "rule": "format/*",
+      "severity": "off"
+    },
+    {
+      "rule": "*-indent",
+      "severity": "off"
+    },
+    {
+      "rule": "*-spacing",
+      "severity": "off"
+    },
+    {
+      "rule": "*-spaces",
+      "severity": "off"
+    },
+    {
+      "rule": "*-order",
+      "severity": "off"
+    },
+    {
+      "rule": "*-dangle",
+      "severity": "off"
+    },
+    {
+      "rule": "*-newline",
+      "severity": "off"
+    },
+    {
+      "rule": "*quotes",
+      "severity": "off"
+    },
+    {
+      "rule": "*semi",
+      "severity": "off"
+    }
+  ],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "vue",
+    "html",
+    "markdown",
+    "json",
+    "jsonc",
+    "yaml",
+    "toml"
+  ],
+  "editor.formatOnSave": true,
+  "editor.wordWrap": "off",
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "prettier.enable": false,
+  "editor.gotoLocation.multipleTypeDefinitions": "goto",
+  "editor.gotoLocation.multipleReferences": "goto",
+  "editor.gotoLocation.multipleDefinitions": "goto",
+  "editor.gotoLocation.multipleImplementations": "goto",
+  "editor.gotoLocation.multipleDeclarations": "goto",
+  "window.title": "${rootName}", // this make tabs more readable
+  "unocss.root": "packages/client",
+  "cSpell.words": [
+    "appsflyer",
+    "autounlock",
+    "earncoins",
+    "exchangezone",
+    "moboshort",
+    "myearnings"
+  ]
+}

@@ -1,0 +1,127 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  /* 防止边距塌陷 */
+  min-height: 0;
+  min-width: 0;
+}
+html {
+  /* 修复iOS点击高亮问题 */
+  -webkit-tap-highlight-color: transparent;
+  /* 平滑滚动 */
+  scroll-behavior: smooth;
+}
+/* 防止超长内容破坏布局 */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  /* 改善CJK文本的显示 */
+  -webkit-text-size-adjust: 100%;
+}
+/* 统一标题样式 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: inherit;
+}
+/* 重置链接样式 */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+/* 重置按钮样式 */
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+/* 修复按钮样式 */
+button,
+[type="button"],
+[type="reset"],
+[type="submit"] {
+  -webkit-appearance: button;
+  background: none;
+  cursor: pointer;
+}
+/*修复i0S表单圆角 */
+input[type="search"],
+input[type="text"] {
+  -webkit-appearance: none;
+  border-radius: 0;
+}
+/* 移除默认样式 */
+ul,
+ol {
+  list-style: none;
+}
+/* 自定义列表缩进 */
+dl,
+dd {
+  margin: 0;
+}
+/*确保嵌套列表正确显示 */
+nav ul {
+  margin: 0;
+  padding: 0;
+}
+/* 图片基础优化 */
+img {
+  border-style: none;
+  vertical-align: middle;
+  height: auto;
+}
+/*SVG优化 */
+svg:not([fill]) {
+  fill: currentColor;
+}
+/*视频元素适配 */
+video {
+  max-width: 100%;
+  height: auto;
+}
+/*触摸元素优化 */
+a,
+button,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+/*禁用长按菜单 */
+img,
+a {
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+/*优化可点击区域 */
+input[type="radio"]input[type="checkbox"] {
+  min-width: 16px;
+  min-height: 16px;
+}

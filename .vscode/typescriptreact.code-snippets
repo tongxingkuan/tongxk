@@ -1,0 +1,20 @@
+{
+  "Component": {
+    "prefix": ["co"],
+    "body": [
+      "import { createComponent } from 'shared'",
+      "type ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}Options = {",
+      "  props: {}",
+      "}",
+      "export const ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/} = createComponent<${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}Options>({",
+      "  props: {},",
+      "}, props => {",
+      "  return () => (",
+      "    <div>${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/} $0</div>",
+      "  )",
+      "})",
+      "",
+      "export default ${TM_FILENAME_BASE/(.*)/${1:/pascalcase}/}",
+    ],
+  },
+}

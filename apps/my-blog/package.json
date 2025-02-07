@@ -1,0 +1,28 @@
+{
+  "name": "my-blog",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host --mode development --port 5174 --no-clearScreen",
+    "build:prod": "vue-tsc -b && vite build --mode production",
+    "build:dev": "vue-tsc -b && vite build --mode development",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.3",
+    "shared": "workspace:*",
+    "preset": "workspace:*",
+    "tailwindcss": "^4.0.3",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue-jsx": "^4.1.1",
+    "@vue/tsconfig": "^0.7.0",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5",
+    "vue-tsc": "^2.2.0"
+  }
+}

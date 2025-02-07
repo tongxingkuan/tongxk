@@ -1,0 +1,19 @@
+{
+  "name": "shared",
+  "version": "1.0.0",
+  "description": "",
+  "main": "shared.ts",
+  "exports": {
+    ".": "./shared.ts"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "vue": "catalog:",
+    "preset": "workspace:*"
+  }
+}
