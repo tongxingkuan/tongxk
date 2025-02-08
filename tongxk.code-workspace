@@ -9,6 +9,10 @@
       "name": "my-blog",
     },
     {
+      "path": "apps/my-blog2",
+      "name": "my-blog2",
+    },
+    {
       "path": "packages/shared",
       "name": "shared",
     },
@@ -26,6 +30,7 @@
       "**/.DS_Store": true,
       "**/Thumbs.db": true,
       "apps/my-blog": true,
+      "apps/my-blog2": true,
       "packages/shared": true,
       "packages/preset": true,
     },
