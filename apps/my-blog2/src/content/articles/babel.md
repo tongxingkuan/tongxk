@@ -130,7 +130,7 @@ module.exports = {
 
 ##### 插件的基本结构
 
-一个简单的 Babel 插件是一个 JavaScript 函数，它可以接受 babel 的 API，并返回一个对象。这个对象必须包含一个 visitor 对象，visitor 是一个包含处理 AST 中各类节点的回调函数的对象。
+一个简单的 Babel 插件是一个 JavaScript 函数，它可以接受 babel 的 API，并返回一个对象。这个对象必须包含一个 visitor 对象，visitor 是一个包含处理 AST 中各类节点的回调函数的对象。可以引入`babel-traverse`进行 AST 遍历和操作，它提供了更灵活的 AST 节点访问方法。
 
 ```js
 module.exports = function ({ types: t }) {
@@ -205,4 +205,50 @@ module.exports = function () {
 
 ### env
 
+针对不同的环境（如 Node.js、浏览器等）应用不同的配置。
+
+```js
+// babel.config.js
+module.exports = {
+  env: {
+    development: {
+      presets: ["@babel/preset-env"],
+    },
+    production: {
+      presets: ["@babel/preset-env"],
+      plugins: ["@babel/plugin-transform-runtime"], // 生产环境使用
+    },
+  },
+};
+```
+
 ### targets
+
+指定目标环境（如浏览器或 Node.js 版本），Babel 会根据目标环境自动确定需要转换的 ECMAScript 语法特性和按需引入 Polyfill。
+
+### Babel 与 Webpack 配合使用
+
+```bash
+npm install --save-dev babel-loader @babel/core @babel/preset-env
+```
+
+```js
+// webpack.config.js
+module.exports = {
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: ["@babel/preset-env"],
+            plugins: ["@babel/plugin-transform-runtime"],
+          },
+        },
+      },
+    ],
+  },
+};
+```
