@@ -14,7 +14,7 @@
 import ClipboardJS from "clipboard";
 
 definePageMeta({
-  layout: "question",
+  layout: "article",
   pageTransition: {
     name: "questions",
   },

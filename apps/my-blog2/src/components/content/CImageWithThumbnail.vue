@@ -1,17 +1,18 @@
 <template>
   <div style="text-align: center">
-    <el-image
+    <n-image
       :src="src"
       :zoom-rate="1.2"
       :preview-src-list="[src]"
       :hide-on-click-modal="true"
       :initial-index="4"
       fit="cover"
-    ></el-image>
+    />
     <div class="tips">{{ alt }}</div>
   </div>
 </template>
 <script setup>
+import { NImage } from "naive-ui";
 defineProps({
   alt: {
     type: String,

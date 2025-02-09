@@ -36,10 +36,15 @@
 
 <script setup lang="ts">
 import {
-  NSpace,
+  Document as DocumentIcon,
+  Albums as QuestionMarkCircleIcon,
+} from "@vicons/ionicons5";
+import {
+  NIcon,
   NLayout,
   NLayoutSider,
   NMenu,
+  NSpace,
   type MenuOption,
 } from "naive-ui";
 import type { Key } from "naive-ui/es/menu/src/interface";
@@ -64,18 +69,29 @@ const collapsed = ref(false);
 const currentKey = ref<Key | undefined>(undefined);
 const currentTitle = ref<string | undefined>(undefined);
 
+function renderIcon(icon: Component) {
+  return () => h(NIcon, null, { default: () => h(icon) });
+}
+
+// 点击菜单项时滚动到对应内容
+const scrollToSection = (key: string) => {
+  const section = document.querySelector(`a[href="${key}"]`) as HTMLElement;
+  if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
+  }
+};
+
 const menuOptions = computed<MenuOption[]>(() => {
   return props.navigationTree.map((item) => ({
-    label: () =>
-      h(
-        RouterLink,
-        {
-          to: item._path,
-        },
-        { default: () => item.title },
-      ),
+    label: item.title,
     key: item._path,
     path: item._path,
+    icon:
+      item.title === "Articles"
+        ? renderIcon(DocumentIcon)
+        : item.title === "Questions"
+          ? renderIcon(QuestionMarkCircleIcon)
+          : undefined,
     children: item.children?.map((child) => ({
       label: () =>
         h(
@@ -133,6 +149,9 @@ watch(
     currentTitle.value = findTitle(
       menuOptions.value as (MenuOption & { labelText: string })[],
     );
+    nextTick(() => {
+      scrollToSection(currentKey.value as string);
+    });
   },
   {
     immediate: true,

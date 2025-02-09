@@ -1,18 +1,19 @@
-// // 请求日志打印
-// export default defineEventHandler(async event => {
-//   const cookies = parseCookies(event)
-//   const path = getRequestPath(event)
-//   const method = getMethod(event)
-//   if (method === 'GET') {
-//     const query = await getQuery(event)
-//   } else if (method === 'POST') {
-//     const body = await readBody(event)
-//   }
-//   // console.log({
-//   //   method,
-//   //   path,
-//   //   cookies,
-//   //   query,
-//   //   body
-//   // })
-// })
+// 请求日志打印
+export default defineEventHandler(async event => {
+  //   let cookies, query, body, path, method
+  //   cookies = parseCookies(event)
+  //   path = getRequestPath(event)
+  //   method = getMethod(event)
+  //   if (method === 'GET') {
+  //     query = await getQuery(event)
+  //   } else if (method === 'POST') {
+  //     body = await readBody(event)
+  //   }
+  // console.log({
+  //   method,
+  //   path,
+  //   cookies,
+  //   query,
+  //   body
+  // })
+})

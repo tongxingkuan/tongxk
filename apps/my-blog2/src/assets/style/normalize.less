@@ -355,11 +355,24 @@ select:-webkit-autofill {
   }
 }
 
-.aside-left,
-.aside-right {
-  .navigation {
-    user-select: none;
-    text-align: left;
+.navigation {
+  user-select: none;
+  text-align: left;
+  font-size: 1.2rem;
+
+  ul {
+    font-size: 1rem;
+    text-indent: 1rem;
+
+    ul {
+      font-size: 0.8rem;
+      text-indent: 2rem;
+
+      ul {
+        font-size: 0.6rem;
+        text-indent: 3rem;
+      }
+    }
   }
 }
 

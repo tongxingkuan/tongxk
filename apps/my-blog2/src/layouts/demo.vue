@@ -7,21 +7,21 @@
       </header>
       <nav class="nav">
         当前位置：
-        <el-breadcrumb>
+        <n-breadcrumb>
           <template
             v-for="(breadcrumb, index) in computedRouteList"
             :key="breadcrumb.name"
           >
             <template v-if="index < computedRouteList.length - 1">
-              <el-breadcrumb-item :to="{ path: breadcrumb.path }">{{
+              <n-breadcrumb-item :to="{ path: breadcrumb.path }">{{
                 breadcrumb.name
-              }}</el-breadcrumb-item>
+              }}</n-breadcrumb-item>
             </template>
             <template v-else>
-              <el-breadcrumb-item>{{ breadcrumb.name }}</el-breadcrumb-item>
+              <n-breadcrumb-item>{{ breadcrumb.name }}</n-breadcrumb-item>
             </template>
           </template>
-        </el-breadcrumb>
+        </n-breadcrumb>
       </nav>
       <main class="demos">
         <el-scrollbar style="max-height: calc(100vh - 110px)">

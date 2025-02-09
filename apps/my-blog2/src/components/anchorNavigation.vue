@@ -5,6 +5,7 @@
       :key="index"
       :title="item.text"
       :class="currentHash === '#' + item.id ? 'active-hash' : ''"
+      class="cursor-pointer truncate"
     >
       <a :href="'#' + item.id">{{ item.text }}</a>
       <anchorNavigation

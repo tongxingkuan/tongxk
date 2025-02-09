@@ -1,48 +1,61 @@
 <template>
   <client-only>
-    <div class="question-layout">
-      <header class="header">
+    <div class="w-screen h-screen flex flex-col overflow-hidden">
+      <header
+        class="w-full h-10 shrink-0 bg-gray-200 flex items-center justify-between px-4"
+      >
         <h1>童话的博客</h1>
         <globalSearch />
       </header>
-      <nav class="nav">
-        当前位置：
-        <el-breadcrumb>
-          <template
-            v-for="(breadcrumb, index) in computedRouteList"
-            :key="breadcrumb.name"
-          >
-            <template v-if="index < computedRouteList.length - 1">
-              <el-breadcrumb-item :to="{ path: breadcrumb.path }">{{
-                breadcrumb.name
-              }}</el-breadcrumb-item>
-            </template>
-            <template v-else>
-              <el-breadcrumb-item>{{ breadcrumb.name }}</el-breadcrumb-item>
-            </template>
+      <!-- <nav class="nav">
+      当前位置：
+      <n-breadcrumb>
+        <template v-for="(breadcrumb, index) in computedRouteList" :key="breadcrumb.name">
+          <template v-if="index < computedRouteList.length - 1">
+            <n-breadcrumb-item :to="{ path: breadcrumb.path }">{{
+              breadcrumb.name
+            }}</n-breadcrumb-item>
           </template>
-        </el-breadcrumb>
-      </nav>
-      <aside class="aside-left">
-        <el-scrollbar style="max-height: calc(100vh - 150px)">
-          <contentNavigation :navigation-tree="cNavigation"></contentNavigation>
-        </el-scrollbar>
-      </aside>
-      <main class="questions">
-        <el-scrollbar style="max-height: calc(100vh - 110px)">
+          <template v-else>
+            <n-breadcrumb-item>{{ breadcrumb.name }}</n-breadcrumb-item>
+          </template>
+        </template>
+      </n-breadcrumb>
+    </nav> -->
+      <div class="flex size-full gap-3 overflow-hidden">
+        <aside
+          class="w-[260px] fixed top-10 left-0 h-[calc(100vh-40px)] overflow-hidden"
+          :class="{ '!w-[84px]': collapsed }"
+        >
+          <contentNavigation
+            class="h-full overflow-y-auto"
+            @update:collapsed="handleCollapsed"
+            :navigation-tree="cNavigation || []"
+          ></contentNavigation>
+        </aside>
+        <main
+          class="ml-[280px] mr-[220px] w-full h-full overflow-y-auto articles transition-all duration-200"
+          :class="{ '!ml-[104px]': collapsed }"
+        >
           <slot></slot>
-        </el-scrollbar>
-      </main>
-      <aside class="aside-right">
-        <el-scrollbar style="max-height: calc(100vh - 150px)">
+        </main>
+        <aside
+          class="w-[200px] fixed top-10 right-0 p-3 h-[calc(100vh-40px)] overflow-y-auto"
+        >
           <anchorNavigation :navigation-tree="aNavigation"></anchorNavigation>
-        </el-scrollbar>
-      </aside>
+        </aside>
+      </div>
       <footer class="footer">版权所有@copyright</footer>
     </div>
   </client-only>
 </template>
 <script setup lang="ts">
+import type { TocLink } from "@nuxt/content";
+const collapsed = ref(false);
+const handleCollapsed = (_collapsed: boolean) => {
+  collapsed.value = _collapsed;
+};
+
 declare interface Breadcrumb {
   name: string;
   path: string;
@@ -82,7 +95,7 @@ const covert = (paths: string[]): Breadcrumb[] => {
 
 const route = useRoute();
 
-const aNavigation = ref([]);
+const aNavigation = ref<TocLink[]>([]);
 
 const computedRouteList = computed(() => {
   const routeList = route.path.split("/");
@@ -91,7 +104,7 @@ const computedRouteList = computed(() => {
 
 // fetchContentNavigation 根据content目录结构生成路由，用queryContent限定想要的目录
 const { data: cNavigation } = await useAsyncData("cNavigation", () => {
-  return fetchContentNavigation(queryContent("questions").sort({}));
+  return fetchContentNavigation(queryContent(""));
 });
 
 // 监听article子路由变化，并根据路由名找到对应的文章对象，body.toc.links是content生成，包含了markdown文档的锚点导航，depth参见配置项nuxt.config.ts。
@@ -100,11 +113,12 @@ if (route.params.slug && route.params.slug.length > 0) {
     "questions/" + route.params.slug[0],
   ).find();
   if (questions && questions.length > 0) {
-    aNavigation.value = questions[0].body.toc.links;
+    aNavigation.value = questions?.[0]?.body?.toc?.links || [];
   } else {
     aNavigation.value = [];
   }
 }
+
 watch(route, async ({ params }) => {
   aNavigation.value = [];
   // 访问pages/index不会有slug，所以判断
@@ -114,7 +128,7 @@ watch(route, async ({ params }) => {
       "questions/" + route.params.slug[0],
     ).find();
     if (questions && questions.length > 0) {
-      aNavigation.value = questions[0].body.toc.links;
+      aNavigation.value = questions?.[0]?.body?.toc?.links || [];
     }
   }
 });
@@ -144,23 +158,6 @@ watch(route, async ({ params }) => {
   display: flex;
   align-items: center;
   justify-content: right;
-}
-
-.aside-left,
-.aside-right {
-  float: left;
-  display: block;
-  width: calc(20% - 50px);
-  height: calc(100vh - 150px);
-  padding-top: 40px;
-  padding-left: 50px;
-}
-
-.questions {
-  float: left;
-  display: block;
-  width: 60%;
-  height: calc(100vh - 110px);
 }
 
 .footer {
