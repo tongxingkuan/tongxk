@@ -43,5 +43,9 @@ export default defineNuxtPlugin(nuxtApp => {
       ],
     },
   )
-  start()
+  start({
+    sandbox: {
+      experimentalStyleIsolation: true,
+    },
+  })
 })

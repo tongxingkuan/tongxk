@@ -77,7 +77,7 @@ function renderIcon(icon: Component) {
 const scrollToSection = (key: string) => {
   const section = document.querySelector(`a[href="${key}"]`) as HTMLElement;
   if (section) {
-    section.scrollIntoView({ behavior: "smooth" });
+    section.scrollIntoView({ block: "center", behavior: "smooth" });
   }
 };
 
