@@ -37,6 +37,7 @@ export const eslintPreset = () => [
       "@stylistic/jsx-max-props-per-line": "off",
       "@stylistic/quote-props": ["error", "as-needed"],
       "@stylistic/max-statements-per-line": ["error", { max: 2 }],
+      "@typescript-eslint/no-explicit-any": "off",
     },
   },
   {

@@ -10,11 +10,23 @@ querys: ["object", "面向对象", "对象", "原型", "数组", "正则"]
 
 我们知道创建对象有两种方式，一种是`对象字面量`，还有一种是通过`new Object`。
 
-先说一下两个方法
+#### 检测数据类型
 
 - `typeof`
 
 返回一个字符串，表示数据类型，可能的值有`number`、`string`、 `boolean`、`symbol`、`object`、`function`、`undefined`、`bigint`。 _需要注意的是`typeof null`返回的是`object`_。
+
+```js
+typeof 1; // number
+typeof "1"; // string
+typeof true; // boolean
+typeof Symbol(); // symbol
+typeof {}; // object
+typeof null; // object
+typeof undefined; // undefined
+typeof BigInt(1); // bigint
+typeof function () {}; // function
+```
 
 - `instanceof`
 
@@ -22,11 +34,58 @@ querys: ["object", "面向对象", "对象", "原型", "数组", "正则"]
 例如以下两段代码返回都是`true`。
 
 ```js
-[] instanceof Array
-[] instanceof Object
+[] instanceof Array // true
+[] instanceof Object // true
 ```
 
 这两个方法可以帮助我们区分`基本数据类型和对象`以及`不同的对象所属的原型链`。
+
+- `Object.prototype.toString.call()`
+
+| 返回值    | typeof    | Object.prototype.toString.call |
+| --------- | --------- | ------------------------------ |
+| number    | number    | \[object Number]               |
+| string    | string    | \[object String]               |
+| boolean   | boolean   | \[object Boolean]              |
+| symbol    | symbol    | \[object Symbol]               |
+| object    | object    | \[object Object]               |
+| function  | function  | \[object Function]             |
+| undefined | undefined | \[object Undefined]            |
+| null      | object    | \[object Null]                 |
+| array     | object    | [object Array]                 |
+| date      | object    | \[object Date]                 |
+| regexp    | object    | \[object RegExp]               |
+| error     | object    | \[object Error]                |
+
+```js
+// 类型检测综合方案
+function getType(data) {
+  // 必须用Object.prototype.toString.call()，不能直接用toString()，因为toString()会被重写，导致检测结果不准确
+  // 例如：
+  // 1. 数组 [].toString() 返回的是 “”
+  // 2. 正则 /a/.toString() 返回的是 “/a/”
+  // 3. 日期 new Date().toString() 返回的是 “Tue Feb 11 2025 16:00:00 GMT+0800 (中国标准时间)”
+  // 4. 错误 new Error().toString() 返回的是 “Error”
+  // 5. 函数 (function () {}).toString() 返回的是 “function () {}”
+  return Object.prototype.toString.call(data).slice(8, -1);
+}
+
+getType(1); // number
+getType("1"); // string
+getType(true); // boolean
+getType(Symbol()); // symbol
+getType({}); // object
+getType([]); // array
+getType(() => {}); // function
+getType(new Date()); // date
+getType(/a/); // regexp
+getType(new Error()); // error
+getType(null); // null
+getType(undefined); // undefined
+getType(NaN); // number
+getType(BigInt(1)); // bigint
+getType(new Map()); // map
+```
 
 回到创建对象，在 js 中，万物皆对象，可以说对象贯穿你在 js 领域编程的一生。
 

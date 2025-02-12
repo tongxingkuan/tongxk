@@ -7,9 +7,6 @@
     ".": "./preset.mjs"
   },
   "types": "./preset.d.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "devDependencies": {
     "@stylistic/eslint-plugin": "^3.0.1",
     "@stylistic/eslint-plugin-jsx": "^3.0.0",

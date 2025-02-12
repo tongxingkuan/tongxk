@@ -3,6 +3,7 @@ cascader
 corejs
 nuxt
 nuxtjs
+qiankun
 rawbody
 sider
 toastui

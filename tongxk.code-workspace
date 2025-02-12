@@ -20,6 +20,10 @@
       "path": "packages/preset",
       "name": "preset",
     },
+    {
+      "path": "apps/my-react-app",
+      "name": "my-react-app",
+    },
   ],
   "settings": {
     "files.exclude": {
@@ -33,6 +37,7 @@
       "apps/my-blog2": true,
       "packages/shared": true,
       "packages/preset": true,
+      "apps/my-react-app": true,
     },
     "search.exclude": {
       "**/node_modules": true,

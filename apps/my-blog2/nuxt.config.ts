@@ -2,10 +2,6 @@
 export default defineNuxtConfig({
   srcDir: 'src/',
   modules: ['@nuxt/content', '@nuxtjs/tailwindcss'],
-  tailwindcss: {
-    exposeConfig: true,
-    viewer: true,
-  },
   content: {
     markdown: {
       toc: {
@@ -47,6 +43,13 @@ export default defineNuxtConfig({
         changeOrigin: true,
         // prependPath: true,
       },
+    },
+  },
+
+  devServer: {
+    // 允许跨域
+    cors: {
+      origin: '*',
     },
   },
 

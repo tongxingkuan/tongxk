@@ -44,7 +44,7 @@
             </NBreadcrumbItem>
           </template>
           <NBreadcrumbItem>
-            <div>{{ route.params.slug[0] }}</div>
+            <div>{{ route.params.slug?.[0] }}</div>
           </NBreadcrumbItem>
         </NBreadcrumb>
       </nav>
@@ -64,7 +64,7 @@
         >
           <slot></slot>
         </main>
-        <aside class="w-[200px] shrink-0 h-full overflow-hidden">
+        <aside class="w-[200px] shrink-0 h-full overflow-y-auto">
           <anchorNavigation :navigation-tree="aNavigation"></anchorNavigation>
         </aside>
       </div>

@@ -1,6 +1,6 @@
 ---
-title: "瀚海拾贝"
-description: ""
+title: "面试题"
+description: "面试题"
 querys: ["面试题", "面试", "知识点"]
 ---
 
@@ -291,4 +291,60 @@ userStore.dispatch({
   type: "changeAge",
   age: -8,
 });
+```
+
+### 数组去重
+
+```js
+function unique(arr) {
+  return [...new Set(arr)];
+}
+```
+
+### 算法题
+
+- 将数字转换为千分位格式，如 `123456789` 转换为 `123,456,789`，保留两位小数
+
+```js
+// 这个是js自带的api，可以实现千分位格式化，保留两位小数
+function formatNumber(num) {
+  return num.toLocaleString("en-US", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 2,
+  });
+}
+
+// 正则实现
+function formatNumber(num) {
+  let str = num.toString();
+  let [integer, decimal] = str.split(".");
+  // 详细解析一下这个正则
+  // \B 表示非单词边界
+  // (?=(\d{3})+) 表示一个或多个3位数字
+  // (?!\d) 表示不是数字
+  // 所以 \B(?=(\d{3})+(?!\d)) 表示非单词边界，且前面有1个或多个3位数字，且后面不是数字
+  // 所以 \B(?=(\d{3})+(?!\d))/g 表示全局匹配
+  integer = integer.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return decimal ? `${integer}.${decimal}` : integer;
+}
+
+// 手搓实现
+function formatNumber(num) {
+  if (typeof num !== "number") {
+    return "-";
+  }
+  let str = num.toString();
+  let [integer, decimal = ""] = str.split(".");
+  decimal = decimal.padEnd(2, "0").slice(0, 2);
+  let result = [],
+    count = 0;
+  for (let i = integer.length - 1; i >= 0; i--) {
+    count++;
+    result.unshift(integer[i]);
+    if (count % 3 === 0 && i !== 0) {
+      result.unshift(",");
+    }
+  }
+  return `${result.join("")}.${decimal}`;
+}
 ```

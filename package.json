@@ -4,14 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky",
     "common": "pnpm --filter common",
     "app": "pnpm --filter web-app",
     "webp": "node bin/webp.mjs",
-    "config:sync": "find apps -mindepth 1 -maxdepth 1 -type d -exec mkdir -p {}/.vscode/ \\; -exec cp .vscode/*.json {}/.vscode/ \\;"
+    "config:sync": "find apps -mindepth 1 -maxdepth 1 -type d -exec mkdir -p {}/.vscode/ \\; -exec cp .vscode/*.json {}/.vscode/ \\;",
+    "rm-modules": "find . -type d -name 'node_modules' -exec rm -rf {} \\;"
   },
   "keywords": [],
   "author": "",
