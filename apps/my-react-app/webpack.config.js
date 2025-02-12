@@ -10,6 +10,8 @@ module.exports = {
     publicPath: "/",
     library: `${name}-[name]`,
     libraryTarget: "umd",
+    // webpack 5 需要把 jsonpFunction 替换成 chunkLoadingGlobal
+    chunkLoadingGlobal: `webpackJsonp_${name}`,
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js", ".jsx", "css"], // 确保处理 TS 和 TSX 文件
