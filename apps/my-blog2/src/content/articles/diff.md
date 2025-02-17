@@ -1,12 +1,98 @@
 ---
 title: "diff算法"
-description: "对比Vue2、Vue3的diff算法"
+description: "对比React、Vue2、Vue3的diff算法"
 querys: ["diff"]
 ---
 
 ## diff算法
 
-> 内容转载自 :c-link{name=哈啰技术团队 href=https://segmentfault.com/a/1190000042586883#item-3-3 target=blank}
+> 内容摘自 :c-link{name=哈啰技术团队 href=https://segmentfault.com/a/1190000042586883#item-3-3 target=blank}
+>
+> 内容摘自 :c-link{name=认识三者的diff算法与对比 href=https://juejin.cn/post/7318446267033452570?FsearchId%3D202502171039446673CEB6FAF7DE6531C5 target=blank}
+
+### React Diff 算法
+
+React 是 Fiber 架构的，Fiber 其实是一个链表的结构，但是由于没有设置反向指针，因此没有使用双端比对的方式去优化 Diff 算法（没有反向指针，从右往左遍历链表会很困难）。这一点在 React 源码 `reconcileChildrenArray` 函数的注释中也有说明。
+
+React 采用 Fiber 架构的原因是 JavaScript 的运行会阻塞页面的渲染，React 为了不阻塞页面的渲染，采用了 Fiber 架构，Fiber 也是一种**链表的数据结构**，基于这个数据结构可以实现由原来不可中断的更新过程变成异步的可中断的更新。
+
+#### 基本原理
+
+React 多节点的 Diff 算法的实现在 `reconcileChildrenArray` 函数中
+
+##### reconcileChildrenArray
+
+首先看一下 `reconcileChildrenArray` 函数入参
+
+```js
+function reconcileChildrenArray(
+  returnFiber: Fiber,
+  currentFirstChild: Fiber | null,
+  newChildren: Array<*>,
+  lanes: Lanes,
+) {
+  // 省略...
+}
+```
+
+- `returnFiber`：当前组件的父级Fiber节点
+- `currentFirstChild`：当前组件的第一个子Fiber节点
+- `newChildren`：新的子节点
+- `lanes`：优先级
+
+###### 第一轮遍历
+
+从头开始遍历 `newChildren` ，逐个与 oldFiber 链中的节点进行比较，判断 DOM 节点是否可复用。如果节点的 key 不同，则不可复用，直接跳出循环，第一轮遍历结束。如果 key 相同，但是 type 不同，则会重新创建节点，将 oldFiber 标记为 `Deletion` ，并继续遍历。
+
+```js
+let previousNewFiber: Fiber | null = null;
+// 省略...
+let lastPlacedIndex = 0;
+let newIdx = 0;
+let oldIdx = 0;
+let nextOldFiber = null;
+let newFiber = null;
+
+
+for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
+  if (oldFiber.index > newIdx) {
+    nextOldFiber = oldFiber;
+    oldFiber = null;
+  } else {
+    nextOldFiber = oldFiber.sibling;
+  }
+  // 生成新的节点，判断 key 与 type 是否相同就在 updateSlot 中
+  // 只有 key 和 type 都相同才会复用 oldFiber 节点
+  const newFiber = updateSlot(
+    returnFiber,
+    oldFiber,
+    newChildren[newIdx],
+    lanes,
+  );
+  if (newFiber === null) {
+    // key 不同，newFiber 会为 null ，直接跳出循环，第一轮遍历结束
+    if (oldFiber === null) {
+      oldFiber = nextOldFiber;
+    }
+    break;
+  }
+  if (shouldTrackSideEffects) {
+    if (oldFiber && newFiber.alternate === null) {
+      // key 相同，但是 type 不同的情况，将 oldFiber 打上 Deletion 的标记
+      deleteChild(returnFiber, oldFiber);
+    }
+  }
+  // 记录最后一个可复用的节点在 oldFiber 中的位置索引
+  lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+  if (previousNewFiber === null) {
+    resultingFirstChild = newFiber;
+  } else {
+    previousNewFiber.sibling = newFiber;
+  }
+  previousNewFiber = newFiber;
+  oldFiber = nextOldFiber;
+}
+```
 
 ### Vue2 Diff 算法
 
@@ -34,7 +120,7 @@ let newEndVnode = newCh[newEndIdx]; // 新vnode列表最后一个子元素
 
 第一步对比结果有五种情形及对应的处理：
 
-**a**. 老头节点与新头节点是同一节点，则`pathVnode`直接复用，同时新老节点的开始索引加 1 。
+a. 老头节点与新头节点是同一节点，则`pathVnode`直接复用，同时新老节点的开始索引加 1 。
 
 ```js
 if (sameVnode(oldStartVnode, newStartVnode)) {
@@ -50,7 +136,7 @@ if (sameVnode(oldStartVnode, newStartVnode)) {
 }
 ```
 
-**b**. 老尾节点与新尾节点是同一节点，则`pathVnode`直接复用，同时新老节点的结束索引减 1 。
+b. 老尾节点与新尾节点是同一节点，则`pathVnode`直接复用，同时新老节点的结束索引减 1 。
 
 ```js
 else if (sameVnode(oldEndVnode, newEndVnode)) {
@@ -60,7 +146,7 @@ else if (sameVnode(oldEndVnode, newEndVnode)) {
 }
 ```
 
-**c**. 老头结点与新尾节点是同一节点，说明更新以后老头节点已经跑到老尾节点后面去了，`patchVnode`复用老头节点以后，将生成的真实 DOM 移动到老尾节点对应的真实 DOM 之后，同时老节点开始索引加 1 ，新节点结束索引减 1 。
+c. 老头结点与新尾节点是同一节点，说明更新以后老头节点已经跑到老尾节点后面去了，`patchVnode`复用老头节点以后，将生成的真实 DOM 移动到老尾节点对应的真实 DOM 之后，同时老节点开始索引加 1 ，新节点结束索引减 1 。
 
 ```js
 else if (sameVnode(oldStartVnode, newEndVnode)) {
@@ -71,7 +157,7 @@ else if (sameVnode(oldStartVnode, newEndVnode)) {
 }
 ```
 
-**d**. 老尾节点与新头结点是同一节点，说明更新以后老尾节点已经跑到老头节点后面去了，`patchVnode`复用老尾节点以后，将生成的真实 DOM 移动到老头节点对应的真实 DOM 之后，同时老节点结束索引减 1 ，新节点开始索引加 1 。
+d. 老尾节点与新头结点是同一节点，说明更新以后老尾节点已经跑到老头节点后面去了，`patchVnode`复用老尾节点以后，将生成的真实 DOM 移动到老头节点对应的真实 DOM 之后，同时老节点结束索引减 1 ，新节点开始索引加 1 。
 
 ```js
 else if (sameVnode(oldEndVnode, newStartVnode)) {
@@ -82,7 +168,7 @@ else if (sameVnode(oldEndVnode, newStartVnode)) {
 }
 ```
 
-**e**. 建立哈希表，通过查找新头结点对应的key，如果找到，则复用，如果没找到，则调用`createElm`新建节点， 无论找到与否，新节点开始索引加 1。
+e. 建立哈希表，通过查找新头结点对应的key，如果找到，则复用，如果没找到，则调用`createElm`新建节点， 无论找到与否，新节点开始索引加 1。
 
 ```js
 else {
@@ -114,7 +200,7 @@ else {
 }
 ```
 
-**f**. 退出循环，新增或删除节点
+f. 退出循环，新增或删除节点
 
 ```js
 // oldStartIdx > oldEndIdx 说明老的 vnode 先遍历完
@@ -167,7 +253,7 @@ let e2 = l2 - 1; // 新vnode的末尾下标
 
 #### 过程详解
 
-**a**. 对新老头节点开始进行比较，寻找相同节点，如果有，则 `patch` 复用节点。新老头节点向后移动。
+a. 对新老头节点开始进行比较，寻找相同节点，如果有，则 `patch` 复用节点。新老头节点向后移动。
 
 ```js
 while (i <= e1 && i <= e2) {
@@ -185,7 +271,7 @@ while (i <= e1 && i <= e2) {
 
 :c-image-with-thumbnail{alt=步骤a src=/img/articles/vue3-stepa.png}
 
-**b**. 对新老尾节点开始进行比较，寻找相同节点，如果有，则 `patch` 复用节点。新老尾节点向前移动。
+b. 对新老尾节点开始进行比较，寻找相同节点，如果有，则 `patch` 复用节点。新老尾节点向前移动。
 
 ```js
 while (i <= e1 && i <= e2) {
@@ -205,7 +291,7 @@ while (i <= e1 && i <= e2) {
 
 :c-image-with-thumbnail{alt=步骤b src=/img/articles/vue3-stepb.png}
 
-**c**. 遍历完新老头尾节点后存在两种特殊情况：
+c. 遍历完新老头尾节点后存在两种特殊情况：
 
 1. 老节点先遍历完，新节点还剩余：创建剩余新节点。
 

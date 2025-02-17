@@ -349,4 +349,25 @@ function formatNumber(num) {
 }
 ```
 
--
+- 给你一个非递减的 有序 整数数组，已知这个数组中恰好有一个整数，它的出现次数超过数组元素总数的 25%。请你找到并返回这个整数
+
+```js
+// 这个解法是遍历数组，然后使用filter方法过滤出出现次数超过数组元素总数的25%的元素，然后返回这个元素
+function findSpecialInteger(arr) {
+  return arr.find(
+    (item) => arr.filter((v) => v === item).length > arr.length * 0.25,
+  );
+}
+
+// 这个解法是使用map记录每个元素出现的次数，然后遍历map，找到出现次数超过数组元素总数的25%的元素，然后返回这个元素
+function findSpecialInteger(arr) {
+  const map = new Map();
+  for (let i = 0; i < arr.length; i++) {
+    map.set(arr[i], (map.get(arr[i]) || 0) + 1);
+    // 如果找到了提前终止遍历
+    if (map.get(arr[i]) > arr.length * 0.25) {
+      return arr[i];
+    }
+  }
+}
+```

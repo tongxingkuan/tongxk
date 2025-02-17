@@ -86,10 +86,10 @@ style.textContent = `
 shadowRoot.appendChild(style);
 
 // 插入内容
-const content = document.createElement("div");
-content.className = "app-header";
-content.textContent = "Hello, Qiankun!";
-shadowRoot.appendChild(content);
+const div = document.createElement("div");
+div.className = "app-header";
+div.textContent = "Hello, Qiankun!";
+shadowRoot.appendChild(div);
 ```
 
 #### 3. 事件隔离

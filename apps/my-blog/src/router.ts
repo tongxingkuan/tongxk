@@ -9,7 +9,7 @@ declare module 'vue-router' {
 
 export const routes = [
   redirect('/article', '/article/a1'),
-  r('/', '', [
+  r('', '', [
     () => import('src/pages/home/mobile-home-page'),
     () => import('src/pages/home/home-page'),
   ]),

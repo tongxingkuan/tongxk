@@ -53,6 +53,43 @@ React从15到16重构了整个架构，原因就是15及以前的版本不支持
 `Fiber`作为代数效应在React中的应用，用于将副作用从函数调用中分离。
 `React Fiber`可以理解为：React内部实现的一套状态更新机制。支持任务不同优先级，可中断与恢复，并且恢复后可以复用之前的中间状态。
 
+#### Fiber的结构
+
+Fiber的结构如下：
+
+```js
+const fiber = {
+  tag: 5, // 节点类型，例如 `FunctionComponent` 、`ClassComponent` 等,
+  key: "a", // 唯一标识，用于进行节点的diff和更新,
+  type: "p", // 元素的类型，对于 FunctionComponent，指函数本身，对于ClassComponent，指 class，对于 HostComponent，指 DOM 节点 tagName,
+  stateNode: <p></p>, // FiberNode 对应的真实 DOM 节点,
+  child: FiberNode, // 子Fiber节点,
+  sibling: FiberNode, // 兄弟Fiber节点,
+  return: FiberNode, // 父Fiber节点,
+  index: 1, // 在兄弟节点列表(父节点的子节点列表)中的位置,
+  pendingProps: {}, // 表示即将被应用到节点的 props 。当父组件发生更新时，会将新的 props 存储在 pendingProps 中，之后会被应用到节点。
+  memoizedProps: {}, // 表示节点上一次渲染的 props 。在完成本次更新之前，memoizedProps 中存储的是上一次渲染时的 props ，用于对比新旧 props 是否发生变化。
+  memoizedState: {}, // 类组件保存上次渲染后的 state ，函数组件保存的 hooks 信息。
+  dependencies: [], // 存储节点的依赖信息，用于处理 useEffect 等情况。
+  updateQueue: {
+    baseState: {}, // 更新队列的基础状态,
+    baseQueue: [], // 更新队列的基础队列,
+    shared: {}, // 共享的更新队列,
+  }, // 用于存储组件的更新状态，比如新的状态、属性或者 context 的变化。
+  mode: 9, // 节点模式,
+  // 以下是关于节点副作用（Effect）的属性：
+  flags: 128, // 副作用标记，表示节点上的各种状态和变化（删除、新增、替换等）。
+  subtreeFlags: 128, // 子树副作用标记，表示子树上的各种状态和变化（删除、新增、替换等）。
+  nextEffect: FiberNode, // 下一个副作用节点,
+  firstEffect: FiberNode, // 第一个副作用节点,
+  lastEffect: FiberNode, // 最后一个副作用节点,
+  // 以下关于优先级相关的属性
+  lanes: 1, // 优先级,
+  childLanes: 1, // 子节点优先级,
+  alternate: FiberNode, // 备用Fiber节点,
+};
+```
+
 #### Fiber工作原理
 
 - React使用`双缓存`来完成Fiber树的构建与替换，对应着DOM树的创建与更新。

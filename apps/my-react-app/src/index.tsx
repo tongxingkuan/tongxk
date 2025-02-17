@@ -10,7 +10,10 @@ const render = (props?: { msg: string }) => {
   root.render(App() as React.ReactElement)
 }
 
-if (!window.__POWERED_BY_QIANKUN__) {
+if (
+  !(window as unknown as Window & { __POWERED_BY_QIANKUN__: boolean })
+    .__POWERED_BY_QIANKUN__
+) {
   render()
 }
 // eslint-disable-next-line @typescript-eslint/require-await

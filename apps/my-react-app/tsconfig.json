@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    // 目标 ECMAScript 版本
+    "target": "ES2020",
+    // 模块系统类型（推荐 ESM）
+    "module": "ESNext",
+    // 模块解析策略（Node 风格）
+    "moduleResolution": "node",
+    // 允许导入 JSON 文件
+    "resolveJsonModule": true,
+
+    // JSX 编译模式（React 17+ 推荐使用 "react-jsx"）
+    "jsx": "react-jsx",
+
+    // 严格类型检查模式
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+
+    // 路径别名配置
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    // 兼容性配置
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
+    // 类型声明库（浏览器环境 + ESNext 特性）
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "typeRoots": ["./node_modules/@types", "./global.d.ts"],
+
+    // 其他优化选项
+    "skipLibCheck": true, // 跳过声明文件检查
+    "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致
+    "noEmit": false // Babel 负责编译时不生成 JS 文件
+  },
+  "include": ["src/**/*", "global.d.ts"],
+  "exclude": ["node_modules", "dist"]
+}
