@@ -42,7 +42,7 @@ function reconcileChildrenArray(
 
 ###### 第一轮遍历
 
-从头开始遍历 `newChildren` ，逐个与 oldFiber 链中的节点进行比较，判断 DOM 节点是否可复用。如果节点的 key 不同，则不可复用，直接跳出循环，第一轮遍历结束。如果 key 相同，但是 type 不同，则会重新创建节点，将 oldFiber 标记为 `Deletion` ，并继续遍历。
+从头开始遍历 `newChildren` ，逐个与 oldFiber 链中的节点进行比较，`updateSlot` 用于判断 DOM 节点是否可复用。如果key 相同，但是 type 不同的情况，将 oldFiber 打上 `Deletion` 的标记(`deleteChild`)。如果节点的 key 不同，则不可复用，直接跳出循环，第一轮遍历结束。`lastPlacedIndex` 用于记录最后一个可复用的节点在 oldFiber 中的位置索引。
 
 ```js
 let previousNewFiber: Fiber | null = null;
@@ -94,6 +94,125 @@ for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
 }
 ```
 
+第一轮遍历之后有四种情况：
+
+1. `newChildren` 与 `oldFiber` 同时遍历完
+2. `newChildren` 没遍历完，`oldFiber` 遍历完
+3. `newChildren` 遍历完，`oldFiber` 没遍历完
+4. `newChildren` 与 `oldFiber` 都没遍历完
+
+`newChildren` 与 `oldFiber` 同时遍历完，这个是最理想的情况，只需在第一轮遍历进行组件 `更新` (`updateSlot`)，此时 `Diff` 结束。
+
+`newChildren` 没遍历完，`oldFiber` 遍历完，这说明 `newChildren` 中剩下的节点都是新插入的节点，只需遍历剩下的 `newChildren` 创建新的 `Fiber` 节点并以此标记为 `Placement`(`placeChild`) 。相关代码逻辑如下 👇
+
+```js
+if (oldFiber === null) {
+  // 遍历剩余的 newChildren
+  for (; newIdx < newChildren.length; newIdx++) {
+    // 创建新的 Fiber 节点
+    const newFiber = createChild(returnFiber, newChildren[newIdx], lanes);
+    if (newFiber === null) {
+      continue;
+    }
+    // 将新的 Fiber 节点标记为 Placement
+    lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+    // 将新的 Fiber 节点用 silbing 指针连接成链表
+    if (previousNewFiber === null) {
+      resultingFirstChild = newFiber;
+    } else {
+      previousNewFiber.sibling = newFiber;
+    }
+    previousNewFiber = newFiber;
+  }
+  // 返回新的 Fiber 节点组成的链表的头部节点
+  return resultingFirstChild;
+}
+```
+
+`newChildren` 遍历完，`oldFiber` 没遍历完，意味着本次更新比之前的节点数量少，有节点被删除了。所以需要遍历剩下的 oldFiber ，依次标记 `Deletion`(`deleteRemainingChildren`) 。相关代码逻辑如下 👇
+
+```js
+if (newIdx === newChildren.length) {
+  // 遍历剩下的 oldFiber 并标记为 Deletion
+  deleteRemainingChildren(returnFiber, oldFiber);
+  return resultingFirstChild;
+}
+
+function deleteRemainingChildren(
+  returnFiber: Fiber,
+  currentFirstChild: Fiber | null,
+): null {
+  if (!shouldTrackSideEffects) {
+    return null;
+  }
+
+  let childToDelete = currentFirstChild;
+  while (childToDelete !== null) {
+    deleteChild(returnFiber, childToDelete);
+    childToDelete = childToDelete.sibling;
+  }
+  return null;
+}
+
+function deleteChild(returnFiber: Fiber, childToDelete: Fiber): void {
+  if (!shouldTrackSideEffects) {
+    // Noop.
+    return;
+  }
+  const deletions = returnFiber.deletions;
+  if (deletions === null) {
+    returnFiber.deletions = [childToDelete];
+    returnFiber.flags |= Deletion;
+  } else {
+    deletions.push(childToDelete);
+  }
+}
+
+```
+
+`newChildren` 与 `oldFiber` 都没遍历完，这是 Diff 算法最难的部分。则有可能存在移动了位置的节点，所以为了快速地找到 oldFiber 中可以复用的节点，则创建一个以 oldFiber 的 key 为 key ，oldFiber 为 value 的 Map 数据结构。然后会遍历剩余的 `newChildren` ，逐个在 map 中寻找 oldFiber 中可复用的节点，如果找到可复用的节点，则将 `oldIndex` 与 `lastPlacedIndex` 比较，如果 `oldIndex` 比 `lastPlacedIndex` 小，则该节点需要 `右移`，将新的 Fiber 节点标记为 `Placement` 。否则，将 `lastPlacedIndex` 更新为 `oldIndex` 。
+
+```js
+// 遍历 newChildren
+for (; newIdx < newChildren.length; newIdx++) {
+  // 在 map 中查找在 oldFiber 中可复用的节点
+  const newFiber = updateFromMap(
+    existingChildren,
+    returnFiber,
+    newIdx,
+    newChildren[newIdx],
+    lanes,
+  );
+  if (newFiber !== null) {
+    // 找到了可复用的 Fiber 节点
+    if (shouldTrackSideEffects) {
+      if (newFiber.alternate !== null) {
+        // 将其从 map 中删除，因为该节点已经被复用了，
+        // 继续留在 map 中会被当做剩余的节点被删除
+        existingChildren.delete(newFiber.key === null ? newIdx : newFiber.key);
+      }
+    }
+    // 更新最后一个可复用节点节点的位置索引
+    lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, newIdx);
+    // 将 newFiber 用 sibling 连接成单链表
+    if (previousNewFiber === null) {
+      resultingFirstChild = newFiber;
+    } else {
+      previousNewFiber.sibling = newFiber;
+    }
+    previousNewFiber = newFiber;
+  }
+}
+
+if (shouldTrackSideEffects) {
+  // 遍历完 newChildren 后，还存在 map 在的节点就是剩余的节点，需要被删除
+  existingChildren.forEach((child) => deleteChild(returnFiber, child));
+}
+
+// 返回新的 fiber 链表
+return resultingFirstChild;
+```
+
 ### Vue2 Diff 算法
 
 Vue2 使用的是`基于递归的双指针 diff 算法`。
@@ -102,7 +221,7 @@ Vue2 使用的是`基于递归的双指针 diff 算法`。
 
 1. 头与头对比，尾与尾对比，找到未移动的节点
 2. 交叉对比，即老节点头与新节点尾对比，老节点尾与新节点头对比，寻找移动后可复用的节点。
-3. 创建一个老节点`key`值的哈希表，然后遍历查找新节点，在剩余新老节点中对比寻找可复用的节点。
+3. 创建一个老节点`key`值的map，然后遍历新节点，在剩余新老节点中对比寻找可复用的节点。
 4. 节点遍历完成后，通过新老索引，进行移除多余老节点或者增加新节点的操作。
 
 ```js
