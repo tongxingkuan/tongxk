@@ -94,6 +94,8 @@ for (; oldFiber !== null && newIdx < newChildren.length; newIdx++) {
 }
 ```
 
+###### 第二轮遍历
+
 第一轮遍历之后有四种情况：
 
 1. `newChildren` 与 `oldFiber` 同时遍历完
