@@ -215,6 +215,8 @@ if (shouldTrackSideEffects) {
 return resultingFirstChild;
 ```
 
+:c-image-with-thumbnail{alt=react-diff src=/img/articles/react-diff.png}
+
 ### Vue2 Diff 算法
 
 Vue2 使用的是`基于递归的双指针 diff 算法`。
@@ -289,7 +291,7 @@ else if (sameVnode(oldEndVnode, newStartVnode)) {
 }
 ```
 
-e. 建立哈希表，通过查找新头结点对应的key，如果找到，则复用，如果没找到，则调用`createElm`新建节点， 无论找到与否，新节点开始索引加 1。
+e. 建立哈希表，通过查找新头结点对应的key，`findIdxInOld`，如果找到，则复用，如果没找到，则调用`createElm`新建节点， 无论找到与否，新节点开始索引加 1。
 
 ```js
 else {
@@ -412,7 +414,7 @@ while (i <= e1 && i <= e2) {
 
 :c-image-with-thumbnail{alt=步骤b src=/img/articles/vue3-stepb.png}
 
-c. 遍历完新老头尾节点后存在两种特殊情况：
+c. 遍历完新老头尾节点后存在三种特殊情况：
 
 1. 老节点先遍历完，新节点还剩余：创建剩余新节点。
 
