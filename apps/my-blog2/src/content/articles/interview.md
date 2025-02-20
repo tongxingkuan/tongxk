@@ -397,9 +397,9 @@ function twoSum(nums, target) {
         - 0 <= Node.val <= 9
         - 题目数据保证列表表示的数字不含前导零
 
-        输入：l1 = `[1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]`, l2 = `[5,6,4]`
+        输入：l1 = [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1], l2 = [5,6,4]
 
-        输出：`[6,6,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]`
+        输出：[6,6,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1]
 
 ```js
 var addTwoNumbers = function (l1, l2) {
@@ -435,5 +435,32 @@ var addTwoNumbers = function (l1, l2) {
     .map((item) => Number(item))
     .reverse();
   return arrToList(resultArr);
+};
+```
+
+5.  给定一个字符串 s ，请你找出其中不含有重复字符的最长子串的长度。
+
+        例如：
+        输入: s = "abcabcbb"
+        输出: 3
+        解释: 因为无重复字符的最长子串是 "abc"，所以其长度为 3。
+
+```js
+var lengthOfLongestSubstring = function (s) {
+  let arr = [],
+    count = 0,
+    max = 0;
+  for (let i = 0; i < s.length; i++) {
+    let char = s[i];
+    let index = arr.indexOf(char);
+    if (index > -1) {
+      count = index + 1;
+      arr = arr.slice(index + 1);
+    }
+    arr.push(char);
+    if (max < arr.length) max = arr.length;
+  }
+  console.log(arr);
+  return max;
 };
 ```
