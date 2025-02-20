@@ -21,6 +21,15 @@ export default defineNuxtPlugin(nuxtApp => {
           msg: 'hello from parent',
         },
       },
+      {
+        name: 'vue2-app',
+        entry: '//localhost:3003/',
+        container: '#vue2App',
+        activeRule: '/qiankun/vue2App',
+        props: {
+          msg: 'hello from parent',
+        },
+      },
     ],
     {
       beforeLoad: [

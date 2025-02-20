@@ -24,6 +24,10 @@
       "path": "apps/my-react-app",
       "name": "my-react-app",
     },
+    {
+      "path": "apps/my-vue2",
+      "name": "my-vue2",
+    },
   ],
   "settings": {
     "files.exclude": {
@@ -38,6 +42,7 @@
       "packages/shared": true,
       "packages/preset": true,
       "apps/my-react-app": true,
+      "apps/my-vue2": true,
     },
     "search.exclude": {
       "**/node_modules": true,
@@ -114,6 +119,6 @@
       "editor.defaultFormatter": "dbaeumer.vscode-eslint",
     },
     "prettier.enable": false,
-    "cSpell.words": ["sider", "webp"],
+    "cSpell.words": ["qiankun", "sider", "webp"],
   },
 }

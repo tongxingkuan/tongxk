@@ -1,12 +1,12 @@
 <template>
   <client-only>
     <div class="w-screen h-screen flex flex-col overflow-hidden">
-      <header
+      <div
         class="w-full h-10 shrink-0 bg-gray-200 flex items-center justify-between px-4"
       >
         <h1>童话的博客</h1>
         <globalSearch />
-      </header>
+      </div>
       <nav class="w-full h-6">
         <NBreadcrumb>
           <NBreadcrumbItem>

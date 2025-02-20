@@ -29,6 +29,18 @@ export default defineConfig({
       useDevMode: true,
     }),
   ],
+  server: {
+    port: 3001,
+    cors: true,
+    hmr: {
+      overlay: false,
+    },
+  },
+  css: {
+    modules: {
+      generateScopedName: '[name]__[local]___[hash:base64:5]',
+    },
+  },
   resolve: {
     alias: {
       src: project('src'),

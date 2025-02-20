@@ -107,5 +107,9 @@
     "exchangezone",
     "moboshort",
     "myearnings"
-  ]
+  ],
+  "css.validate": false,
+  "tailwindCSS.includeLanguages": {
+    "vue": "html"
+  }
 }

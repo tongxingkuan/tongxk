@@ -34,8 +34,14 @@ export const routes = [
   ),
 ]
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(window.__POWERED_BY_QIANKUN__ ? '/viteApp/' : '/'),
   routes,
 })
+
+declare global {
+  interface Window {
+    __POWERED_BY_QIANKUN__: boolean
+  }
+}
 
 export default router

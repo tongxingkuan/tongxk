@@ -110,6 +110,7 @@ export const eslintPreset = () => [
         "@typescript-eslint/no-redundant-type-constituents": "off",
         "@typescript-eslint/no-unnecessary-type-constraint": "off",
         "@typescript-eslint/no-empty-object-type": "off",
+        "@typescript-eslint/require-await": "off",
         "@typescript-eslint/no-unused-vars": [
           "warn",
           {

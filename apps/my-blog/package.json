@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host --mode development --port 3001 --no-clearScreen",
+    "dev": "vite --host --mode development --no-clearScreen",
     "build:prod": "vue-tsc -b && vite build --mode production",
     "build:dev": "vue-tsc -b && vite build --mode development",
     "preview": "vite preview"
