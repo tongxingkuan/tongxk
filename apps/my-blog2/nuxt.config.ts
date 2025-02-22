@@ -49,7 +49,6 @@ export default defineNuxtConfig({
       },
     },
   },
-
   devServer: {
     // 允许跨域
     cors: {

@@ -1,5 +1,6 @@
 import { r, redirect, rs } from 'shared'
 import { createRouter, createWebHistory } from 'vue-router'
+import { qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 
 declare module 'vue-router' {
   interface RouteMeta {
@@ -9,7 +10,7 @@ declare module 'vue-router' {
 
 export const routes = [
   redirect('/article', '/article/a1'),
-  r('', '', [
+  r('/', '', [
     () => import('src/pages/home/mobile-home-page'),
     () => import('src/pages/home/home-page'),
   ]),
@@ -33,15 +34,12 @@ export const routes = [
     ],
   ),
 ]
+
 const router = createRouter({
-  history: createWebHistory(window.__POWERED_BY_QIANKUN__ ? '/viteApp/' : '/'),
+  history: createWebHistory(
+    qiankunWindow.__POWERED_BY_QIANKUN__ ? '/qiankun/viteApp/' : '',
+  ),
   routes,
 })
-
-declare global {
-  interface Window {
-    __POWERED_BY_QIANKUN__: boolean
-  }
-}
 
 export default router

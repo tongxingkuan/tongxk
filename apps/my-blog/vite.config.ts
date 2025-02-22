@@ -32,8 +32,8 @@ export default defineConfig({
   server: {
     port: 3001,
     cors: true,
-    hmr: {
-      overlay: false,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
     },
   },
   css: {

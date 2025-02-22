@@ -9,11 +9,34 @@ import {
 
 let app: VueApp | undefined = undefined
 
+declare global {
+  interface Window {
+    __POWERED_BY_QIANKUN__: boolean
+    _QIANKUN_YD: {
+      event: {
+        on: (eventName: string, callback: (...args: unknown[]) => void) => void
+        emit: (eventName: string, ...args: unknown[]) => void
+        once: (
+          eventName: string,
+          callback: (...args: unknown[]) => void,
+        ) => void
+        off: (
+          eventName: string,
+          callback: (...args: unknown[]) => void,
+        ) => void
+        watch: (callback: (...args: unknown[]) => void) => void
+      }
+    }
+  }
+}
+
 const render = (props: unknown) => {
   console.log('子应用（viteApp）', props)
+  const { container } = props as { container: HTMLElement }
   app = createApp(App)
   app.use(router)
-  app.mount('#app')
+  app.mount(container ? container.querySelector('#app') : '#app')
+  window._QIANKUN_YD.event.emit('loading', 'vue3')
 }
 
 const initQianKun = () => {

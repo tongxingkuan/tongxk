@@ -12,8 +12,8 @@ function render(props = {}) {
   instance = new Vue({
     render: h => h(App),
   }).$mount(container ? container.querySelector('#app') : '#app')
+  window._QIANKUN_YD.event.emit('loading', 'vue2')
 }
-
 // 非qiankun环境下，也能独立运行时
 if (!window.__POWERED_BY_QIANKUN__) {
   render()

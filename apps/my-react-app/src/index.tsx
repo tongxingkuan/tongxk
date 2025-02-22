@@ -4,27 +4,46 @@ import './public-path'
 
 let root: ReactDOM.Root
 
+declare global {
+  interface Window {
+    __POWERED_BY_QIANKUN__: boolean
+    _QIANKUN_YD: {
+      event: {
+        on: (eventName: string, callback: (...args: unknown[]) => void) => void
+        emit: (eventName: string, ...args: unknown[]) => void
+        once: (
+          eventName: string,
+          callback: (...args: unknown[]) => void,
+        ) => void
+        off: (
+          eventName: string,
+          callback: (...args: unknown[]) => void,
+        ) => void
+        watch: (callback: (...args: unknown[]) => void) => void
+      }
+    }
+  }
+}
+
 const render = (props?: { msg: string }) => {
   console.log('render', props)
   root = ReactDOM.createRoot(document.getElementById('root') as Element)
   root.render(App() as React.ReactElement)
 }
 
-if (
-  !(window as unknown as Window & { __POWERED_BY_QIANKUN__: boolean })
-    .__POWERED_BY_QIANKUN__
-) {
+if (!window.__POWERED_BY_QIANKUN__) {
   render()
 }
-// eslint-disable-next-line @typescript-eslint/require-await
+
 async function bootstrap() {
   console.log('%c%s', 'color: green;', 'react bootstraped')
 }
-// eslint-disable-next-line @typescript-eslint/require-await
+
 async function mount(props: { msg: string }) {
   render(props)
+  window._QIANKUN_YD.event.emit('loading', 'react')
 }
-// eslint-disable-next-line @typescript-eslint/require-await
+
 async function unmount() {
   root.unmount()
 }

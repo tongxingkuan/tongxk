@@ -464,3 +464,32 @@ var lengthOfLongestSubstring = function (s) {
   return max;
 };
 ```
+
+6. 给你一个字符串 `s` ，返回最长的回文子串。
+
+```js
+function longestPalindrome(s) {
+  let maxLen = 0,
+    startIndex = 0,
+    len = s.length;
+  for (let i = 0; i < len; i++) {
+    let left = i - 1;
+    let len = 1;
+    while (s[i + 1] === s[i]) {
+      i++;
+      len++;
+    }
+    let right = i + 1;
+    while (s[left] === s[right] && left >= 0 && s[right] !== undefined) {
+      left--;
+      right++;
+      len += 2;
+    }
+    if (len > maxLen) {
+      maxLen = len;
+      startIndex = left + 1;
+    }
+  }
+  return s.slice(startIndex, startIndex + maxLen);
+}
+```
