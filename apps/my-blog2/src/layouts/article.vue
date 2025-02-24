@@ -7,13 +7,18 @@
         <h1>童话的博客</h1>
         <globalSearch />
       </div>
-      <nav class="w-full h-6">
-        <NBreadcrumb>
-          <NBreadcrumbItem>
+      <nav class="w-full h-12 !flex items-end justify-end p-3">
+        <x-navigation-breadcrumb
+          class="gap-x-3 items-end justify-end md:flex hidden"
+        >
+          <x-navigation-breadcrumb-item>
             <RouterLink to="/">Home</RouterLink>
-          </NBreadcrumbItem>
+          </x-navigation-breadcrumb-item>
+          <x-navigation-breadcrumb-item>
+            <span>></span>
+          </x-navigation-breadcrumb-item>
           <template v-for="item in cNavigation">
-            <NBreadcrumbItem
+            <x-navigation-breadcrumb-item
               :key="item.name"
               v-if="
                 route.path.includes('questions')
@@ -41,16 +46,19 @@
               >
                 <div>{{ item.title }}</div>
               </NDropdown>
-            </NBreadcrumbItem>
+            </x-navigation-breadcrumb-item>
           </template>
-          <NBreadcrumbItem>
+          <x-navigation-breadcrumb-item>
+            <span>></span>
+          </x-navigation-breadcrumb-item>
+          <x-navigation-breadcrumb-item>
             <div>{{ route.params.slug?.[0] }}</div>
-          </NBreadcrumbItem>
-        </NBreadcrumb>
+          </x-navigation-breadcrumb-item>
+        </x-navigation-breadcrumb>
       </nav>
       <div class="flex size-full gap-3 overflow-hidden">
         <aside
-          class="w-[260px] shrink-0 h-full overflow-hidden"
+          class="md:!block !hidden w-[260px] shrink-0 h-full overflow-hidden"
           :class="{ '!w-[84px]': collapsed }"
         >
           <contentNavigation
@@ -64,7 +72,9 @@
         >
           <slot></slot>
         </main>
-        <aside class="w-[200px] shrink-0 h-full overflow-y-auto">
+        <aside
+          class="md:!block !hidden w-[200px] shrink-0 h-full overflow-y-auto"
+        >
           <anchorNavigation :navigation-tree="aNavigation"></anchorNavigation>
         </aside>
       </div>
@@ -74,7 +84,7 @@
 </template>
 <script setup lang="ts">
 import type { TocLink } from "@nuxt/content";
-import { NBreadcrumb, NBreadcrumbItem, NDropdown } from "naive-ui";
+import { NDropdown } from "naive-ui";
 import { RouterLink } from "vue-router";
 const collapsed = ref(false);
 const handleCollapsed = (_collapsed: boolean) => {

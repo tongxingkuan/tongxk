@@ -190,10 +190,10 @@ select:-webkit-autofill {
   background-position: bottom right;
 }
 
-.articles,
-.questions {
+.articles {
   line-height: 30px;
   word-break: break-word;
+  padding: 0 1rem;
 
   h2 {
     font-size: 2rem;
@@ -284,11 +284,7 @@ select:-webkit-autofill {
     padding: 8px 16px 6px 16px;
     line-height: 1.5rem;
     overflow: auto;
-    @apply my-2;
-  }
-
-  p {
-    margin-bottom: 16px;
+    margin: 1rem 0;
   }
 
   em {
@@ -379,19 +375,6 @@ select:-webkit-autofill {
         }
       }
     }
-  }
-}
-
-@media (max-width: 960px) {
-  .aside-left,
-  .aside-right {
-    display: none !important;
-  }
-
-  .articles,
-  .questions {
-    width: calc(100% - 20px) !important;
-    padding: 0 10px;
   }
 }
 
