@@ -304,6 +304,7 @@ function formatNumber(num) {
 function formatNumber(num) {
   let str = num.toString();
   let [integer, decimal] = str.split(".");
+  decimal = decimal.padEnd(2, "0").slice(0, 2);
   // 详细解析一下这个正则
   // \B 表示非单词边界
   // (?=(\d{3})+) 表示一个或多个3位数字
@@ -434,13 +435,11 @@ var addTwoNumbers = function (l1, l2) {
 ```js
 var lengthOfLongestSubstring = function (s) {
   let arr = [],
-    count = 0,
     max = 0;
   for (let i = 0; i < s.length; i++) {
     let char = s[i];
     let index = arr.indexOf(char);
     if (index > -1) {
-      count = index + 1;
       arr = arr.slice(index + 1);
     }
     arr.push(char);
