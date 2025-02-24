@@ -493,3 +493,24 @@ function longestPalindrome(s) {
   return s.slice(startIndex, startIndex + maxLen);
 }
 ```
+
+7. 盛最多水的容器，给你一个数组，数组中的每个元素代表一个高度，求出这个数组中，两个元素之间的最大面积。数组长度范围：`[2, 10^5]`，每个元素的高度范围：`[0, 10^4]`。
+
+```js
+function maxArea(height) {
+  let max = 0,
+    left = 0,
+    right = height.length - 1;
+  while (left < right) {
+    max = Math.max(max, Math.min(height[left], height[right]) * (right - left));
+    if (height[left] < height[right]) {
+      left++;
+    } else {
+      right--;
+    }
+  }
+  return max;
+}
+```
+
+8. 给你一个字符串 `s` ，请你找出其中不含有重复字符的最长子串的长度。

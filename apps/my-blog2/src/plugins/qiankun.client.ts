@@ -5,17 +5,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   registerMicroApps(
     [
       {
-        name: "react-app",
-        entry: "//localhost:3002/",
-        container: "#reactApp",
-        activeRule: "/qiankun/reactApp",
-        props: {
-          msg: "hello from parent",
-        },
-      },
-      {
         name: "vite-app",
-        entry: "//localhost:3001/",
+        entry: import.meta.env.DEV
+          ? "//localhost:3001/"
+          : "http://tongxingkuan.xin:3001/",
         container: "#viteApp",
         activeRule: "/qiankun/viteApp",
         props: {
@@ -23,8 +16,21 @@ export default defineNuxtPlugin((nuxtApp) => {
         },
       },
       {
+        name: "react-app",
+        entry: import.meta.env.DEV
+          ? "//localhost:3002/"
+          : "http://tongxingkuan.xin:3002/",
+        container: "#reactApp",
+        activeRule: "/qiankun/reactApp",
+        props: {
+          msg: "hello from parent",
+        },
+      },
+      {
         name: "vue2-app",
-        entry: "//localhost:3003/",
+        entry: import.meta.env.DEV
+          ? "//localhost:3003/"
+          : "http://tongxingkuan.xin:3003/",
         container: "#vue2App",
         activeRule: "/qiankun/vue2App",
         props: {
