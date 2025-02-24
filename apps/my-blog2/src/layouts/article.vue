@@ -8,9 +8,7 @@
         <globalSearch />
       </div>
       <nav class="w-full h-12 !flex items-end justify-end p-3">
-        <x-navigation-breadcrumb
-          class="gap-x-3 items-end justify-end md:flex hidden"
-        >
+        <x-navigation-breadcrumb class="gap-x-3 items-end justify-end flex">
           <x-navigation-breadcrumb-item>
             <RouterLink to="/">Home</RouterLink>
           </x-navigation-breadcrumb-item>
