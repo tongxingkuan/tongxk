@@ -120,5 +120,7 @@
     },
     "prettier.enable": false,
     "cSpell.words": ["qiankun", "sider", "webp"],
+    "liveServer.settings.multiRootWorkspaceName": "root",
+    "liveServer.settings.port": 5501,
   },
 }

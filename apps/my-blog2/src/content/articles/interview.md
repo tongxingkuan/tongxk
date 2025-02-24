@@ -188,14 +188,6 @@ for (let k of obj) {
 
 **CLS**：`cumulative layout shift`，累积布局偏移，页面可见元素的偏移量，改进方案：每次都为图像、视频元素设置固定宽高，使用transform，而不是改变元素位置实现动画
 
-### 文件断点续传
-
-1. 将文件分片。通过 `File` 对象的 `slice` 方法。
-2. 上传文件分片。依次传输每个文件分片，并记录当前传输的文件分片索引和总文件大小。
-3. 保存上传进度。每次上传成功后计算并保存进度，可以保存到本地也可以保存到服务端。
-4. 续传。读取上传进度，计算下一个文件分片的起始位置，继续上传剩余的文件分片。
-5. 合并文件分片。在所有文件分片上传完后，服务端恢复文件完整性。
-
 ### CSS长宽比容器代码实现
 
 在CSS中 `padding-top` 或 `padding-bottom` 的百分比值是根据容器的width来计算的。如此一来就很好的实现了容器的长宽比。采用这种方法,需要把容器的height设置为0。而容器内容的所有元素都需要采用 `position:absolute` ,不然子元素内容都将被padding挤出容器。
@@ -213,12 +205,6 @@ for (let k of obj) {
   padding-top: 75%;
 }
 ```
-
-### onpopstate可以监听到一个pushstate的事件吗
-
-`onpopstate` 事件只能监听到浏览器历史记录的前进和后退操作，无法直接监听到 `pushState` 或 `replaceState` 的调用。
-
-可以在调用 `pushState` 或 `replaceState` 之后手动触发 `popstate` 事件，来模拟类似的效果。
 
 ```js
 // 监听 popstate 事件

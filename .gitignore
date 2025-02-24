@@ -4,3 +4,4 @@ tsconfig.app.tsbuildinfo
 .DS_Store
 apps/.DS_Store
 apps/**/.DS_Store
+apps/**/*.tar.gz

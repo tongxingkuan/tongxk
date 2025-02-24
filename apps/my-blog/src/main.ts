@@ -36,7 +36,9 @@ const render = (props: unknown) => {
   app = createApp(App)
   app.use(router)
   app.mount(container ? container.querySelector('#app') : '#app')
-  window._QIANKUN_YD.event.emit('loading', 'vue3')
+  if (qiankunWindow.__POWERED_BY_QIANKUN__) {
+    qiankunWindow._QIANKUN_YD.event.emit('loading', 'vue3')
+  }
 }
 
 const initQianKun = () => {
