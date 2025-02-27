@@ -8,7 +8,7 @@ querys: ["算法"]
 
 ### 双指针
 
-#### 1. 三数之和
+#### 1. [三数之和](https://leetcode.cn/problems/3sum/)
 
 ```js
 function threeSum(nums) {
@@ -84,6 +84,28 @@ function maxArea(height) {
     }
   }
   return max;
+}
+```
+
+#### 4. 分发饼干
+
+```js
+function findContentChildren(g, s) {
+  g.sort((a, b) => a - b);
+  s.sort((a, b) => a - b);
+  let count = 0;
+  let i = 0,
+    j = 0;
+  while (i < g.length && j < s.length) {
+    if (g[i] <= s[j]) {
+      count++;
+      i++;
+      j++;
+    } else {
+      j++;
+    }
+  }
+  return count;
 }
 ```
 

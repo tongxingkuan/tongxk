@@ -181,4 +181,38 @@ compiler.run((err, stats) => {
 - `optimizeChunks`: 时机：在 `seal` 函数中，在 `chunk` 集合构建完毕后触发， `SplitChunksPlugin` 插件基于此事件分析 `chunks` 集合的内容，实现拆分优化
 - `done`: 时机：编译完成时触发， `webpack-bundle-analyzer` 插件基于此钩子实现打包分析
 
+#### compiler和compilation的区别
+
+1. 生命周期与创建时机
+
+- `compiler` 全局唯一，在 Webpack 启动时创建，贯穿整个构建生命周期，仅初始化一次。适用于与构建环境相关的全局配置（如 `entry`、`output`、`plugins` 等），不因文件改动而重新创建
+- `compilation` 动态生成，每次文件变化或重新构建时（如开发模式下的热更新），都会生成一个新的实例。处理当前版本的资源编译，包含模块、依赖、优化结果等动态信息
+
+2. 功能与职责
+
+`compiler`
+
+- 环境配置：管理 Webpack 的全局配置（如 options、loaders、plugins）。
+- 插件管理：注册和调用插件，处理插件的生命周期。
+- 构建入口：定义入口文件和入口上下文。
+- 监听文件系统：支持文件变化监听（如 watch 模式），触发重新构建。
+
+`compilation`
+
+- 模块管理：管理模块依赖关系，包括模块解析、依赖分析等。
+- 代码生成：将模块转换为浏览器可执行的 JavaScript 代码。
+- 资源优化：执行代码优化（如 `Uglify`、`Tree Shaking`、`Chunk 拆分`）。
+- 错误处理：收集和报告构建错误。
+
+3. 设计目的
+
+- `compiler` 设计目的：提供一个全局配置环境，管理 Webpack 的构建过程，确保全局配置和插件的稳定性。
+- `compilation` 设计目的：确保每次编译的独立性，避免因多次构建导致状态污染
+
+通过这种设计，Webpack 实现了 环境配置与具体编译的解耦，提升构建效率和插件扩展性。
+
+#### hmr
+
+#### tree shaking
+
 ### rollup

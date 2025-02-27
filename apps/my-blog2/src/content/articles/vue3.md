@@ -27,12 +27,12 @@ querys: ["vue", "vue3", "源码"]
 该文件用于解析 scripts 中的命令并获取到各种参数，用于后续打包配置。
 
 ```javascript
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const args = minimist(process.argv.slice(2));
-const target = args._[0] || "vue";
-const format = args.f || "global";
-const inlineDeps = args.i || args.inline;
-const pkg = require(`../packages/${target}/package.json`);
+const __dirname = dirname(fileURLToPath(import.meta.url)); // 获取当前文件的目录，import.meta.url 是当前文件的 URL 地址
+const args = minimist(process.argv.slice(2)); // 解析命令行参数，process.argv 是命令行参数数组，slice(2) 是去掉前两个参数（node 和 脚本路径）
+const target = args._[0] || "vue"; // 获取目标文件，args._[0] 是目标文件，如果没有则默认为 "vue"
+const format = args.f || "global"; // 获取打包格式，args.f 是打包格式，如果没有则默认为 "global"
+const inlineDeps = args.i || args.inline; // 获取内联依赖，args.i 是内联依赖，如果没有则默认为 args.inline
+const pkg = require(`../packages/${target}/package.json`); // 获取目标文件的 package.json 文件
 ```
 
 以上是截取的部分源码，在阅读该源码过程中，如果不知道某行代码的含义，这个时候，有一种常用的调试方式，它就是 **console.log(desciprtion, somethingToPrint)** 。其中`desciprtion`可以让在众多的打印中快速过滤出要打印的内容。
