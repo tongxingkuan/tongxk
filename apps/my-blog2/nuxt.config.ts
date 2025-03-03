@@ -31,10 +31,10 @@ export default defineNuxtConfig({
     },
   },
   css: [
-    '~/assets/style/normalize.less',
     '~/assets/style/theme.less',
     '~/assets/style/animate.less',
     '~/assets/style/tailwind.css',
+    '~/assets/style/normalize.less',
   ],
   vite: {
     plugins: [tailwindcss()],
