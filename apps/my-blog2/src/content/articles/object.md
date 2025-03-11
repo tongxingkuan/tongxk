@@ -136,6 +136,24 @@ function deepFreeze(obj) {
 
 #### 检测数据类型
 
+#### 手搓 instanceof
+
+首先 `typeof` 构造函数 返回的是function，所以需要先判断right是否为函数。
+其次 使用 `Object.getPrototypeOf` 获取left的原型，然后和right的原型进行比较，如果相等则返回true，否则继续向上查找，直到找到null为止。
+
+````js
+function myInstanceof(left, right) {
+  let proto = Object.getPrototypeOf(left);
+  if (typeof right !== "function") {
+    throw new Error("right must be a function");
+  }
+  while (proto) {
+    if (proto === right.prototype) return true;
+    proto = Object.getPrototypeOf(proto);
+  }
+  return false;
+}
+
 - `typeof`
 
 返回一个字符串，表示数据类型，可能的值有`number`、`string`、 `boolean`、`symbol`、`object`、`function`、`undefined`、`bigint`。 _需要注意的是`typeof null`返回的是`object`_。
@@ -150,7 +168,7 @@ typeof null; // object
 typeof undefined; // undefined
 typeof BigInt(1); // bigint
 typeof function () {}; // function
-```
+````
 
 - `instanceof`
 
