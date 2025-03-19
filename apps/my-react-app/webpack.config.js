@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 const { name } = require("./package");
 
 module.exports = {
@@ -14,6 +15,9 @@ module.exports = {
     chunkLoadingGlobal: `webpackJsonp_${name}`,
   },
   resolve: {
+    alias: {
+      src: path.resolve(__dirname, "src"),
+    },
     extensions: [".ts", ".tsx", ".js", ".jsx", "css"], // 确保处理 TS 和 TSX 文件
   },
   module: {
@@ -21,7 +25,7 @@ module.exports = {
       {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: ["ts-loader"],
+        use: ["babel-loader", "ts-loader"],
       },
       {
         test: /\.css$/,
@@ -37,6 +41,17 @@ module.exports = {
         collapseWhitespace: true,
       },
     }),
+    // new BundleAnalyzerPlugin({
+    //   analyzerMode: "server",
+    //   analyzerPort: 8888,
+    //   openAnalyzer: true,
+    //   reportFilename: "report.html",
+    //   defaultSizes: "parsed",
+    //   generateStatsFile: true,
+    //   statsFilename: "stats.json",
+    //   logLevel: "info",
+    //   browser: "chrome",
+    // }),
   ],
   optimization: {
     splitChunks: {

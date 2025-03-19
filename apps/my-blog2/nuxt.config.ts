@@ -39,16 +39,6 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  // 跨域处理 https://blog.csdn.net/weixin_42888568/article/details/130533216
-  nitro: {
-    devProxy: {
-      '/apiproxy': {
-        target: '',
-        changeOrigin: true,
-        // prependPath: true,
-      },
-    },
-  },
   devServer: {
     // 允许跨域
     cors: {
