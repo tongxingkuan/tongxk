@@ -13,7 +13,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "vue": "catalog:",
-    "preset": "workspace:*"
+    "preset": "workspace:*",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^12.1.2"
   }
 }

@@ -236,9 +236,15 @@ function createStore(reducer) {
   const dispatch = (action) => {
     state = reducer(state, action);
     subscribers.forEach((subscriber) => subscriber());
+    return action;
   };
 
-  const subscribe = (subscriber) => subscribers.push(subscriber);
+  const subscribe = (subscriber) => {
+    let idx = subscribers.push(subscriber);
+    return () => {
+      subscribers.splice(idx, 1);
+    };
+  };
 
   return {
     getState,
@@ -284,5 +290,23 @@ userStore.dispatch({
 ```js
 function unique(arr) {
   return [...new Set(arr)];
+}
+```
+
+### 手搓instanceof
+
+```js
+function myInstanceof(left, right) {
+  if (typeof right !== "function") {
+    return "right must be function";
+  }
+  let proto = Object.getPrototypeOf(left);
+  while (proto) {
+    if (proto === right.prototype) {
+      return true;
+    }
+    proto = Object.getPrototypeOf(proto);
+  }
+  return false;
 }
 ```

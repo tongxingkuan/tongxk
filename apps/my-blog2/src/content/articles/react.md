@@ -108,3 +108,40 @@ update时，具体的步骤如下：
 
 1. 触发状态改变，开启新一次的`render阶段`并构建一颗新的`workInProgress树`，和mount时一样，`workInProgressFiber`的创建可以复用`current树`对应的节点数据。能够复用的判断依据是`Diff算法`。
 2. `commit阶段`，渲染构建好的`workInProgress树`，渲染完毕后，将`workInProgress树`变为`current树`。
+
+#### 时间切片
+
+通过以下代码开启`Concurrent mode`，也就是启用`时间切片`
+
+```js
+// 通过使用ReactDOM.unstable_createRoot开启Concurrent Mode
+// ReactDOM.render(<App/>, rootEl);
+ReactDOM.unstable_createRoot(rootEl).render(<App />);
+```
+
+#### render阶段
+
+`递`和`归`
+
+递：通过 `performUnitOfWork` 构建 `workInProgress` 作为 `workInProgress.child`, 并返回 `workInProgress` 作为下一次 `performUnitWork` 的入参,
+归：通过 `completeUnitOfWork` 将已生成的子孙`DOM节点`插入当前生成的`DOM节点`下，当执行到 `rootFiber` 时，就构建好了一个 `离屏DOM树`
+
+1. `beginWork(current, workInProgress, renderLanes)`
+
+- `current`: 当前组件对应的 `fiber节点` 在上一次更新的 `fiber节点` 即 `workInProgress.alternate`
+- `workInProgress`: 当前组件对应的 `fiber节点`
+- `renderLanes`: 优先级
+
+判断fiber是否可以复用，核心方法 `reconcileChildFibers`, 并给 fiber 添加 `effectTag` 标记。`Diff`算法就是在这里比较是否有可以复用的节点。
+
+2. `completeWork`
+
+`appendAllChildren` 将 `子孙DOM节点` 插入刚生成的 `DOM节点` 中, 将DOM节点赋值给 `workInProgress.stateNode` 。
+
+#### commit 阶段
+
+`Renderer`工作的阶段被称为commit阶段。在commit阶段会触发一些生命周期钩子（如 `componentDidXXX`）和 hook（如`useLayoutEffect`、`useEffect`）。
+
+1. `before mutation阶段`：处理DOM节点渲染/删除后的`autoFoucus`、`blur`逻辑；调用 `getSnapshotBeforeUpdate` 生命周期钩子；调度 `useEffect`
+2. `mutation阶段`：遍历 `effectList`，根据`ContentReset effectTag`重置文字节点；更新`ref`；根据`effectTag`分别处理，其中effectTag包括(`Placement` | `Update` | `Deletion` | `Hydrating`)
+3.
