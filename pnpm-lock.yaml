@@ -147,7 +147,7 @@ importers:
     devDependencies:
       "@nuxt/devtools":
         specifier: latest
-        version: 2.3.1(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
+        version: 2.3.2(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       "@originjs/vite-plugin-federation":
         specifier: ^1.3.9
         version: 1.4.0
@@ -166,15 +166,24 @@ importers:
 
   apps/my-react-app:
     dependencies:
+      "@reduxjs/toolkit":
+        specifier: ^2.6.1
+        version: 2.6.1(react-redux@9.2.0(@types/react@19.0.8)(react@19.0.0)(redux@5.0.1))(react@19.0.0)
       react:
         specifier: ^19.0.0
         version: 19.0.0
       react-dom:
         specifier: ^19.0.0
         version: 19.0.0(react@19.0.0)
+      react-redux:
+        specifier: ^9.2.0
+        version: 9.2.0(@types/react@19.0.8)(react@19.0.0)(redux@5.0.1)
       react-router-dom:
         specifier: ^7.3.0
         version: 7.4.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      redux-thunk:
+        specifier: ^3.1.0
+        version: 3.1.0(redux@5.0.1)
       ts-loader:
         specifier: ^9.5.2
         version: 9.5.2(typescript@5.7.3)(webpack@5.97.1(webpack-cli@6.0.1))
@@ -191,6 +200,9 @@ importers:
       "@types/css-modules":
         specifier: ^1.0.5
         version: 1.0.5
+      "@types/node":
+        specifier: ^18.19.75
+        version: 18.19.75
       "@types/react":
         specifier: ^19.0.8
         version: 19.0.8
@@ -2241,10 +2253,10 @@ packages:
     peerDependencies:
       vite: "*"
 
-  "@nuxt/devtools-kit@2.3.1":
+  "@nuxt/devtools-kit@2.3.2":
     resolution:
       {
-        integrity: sha512-sggap7UTV0823cZk1buCEdd3KG+dMo73DpBuN+zHFC8UG3PfSKDlbVmQGb0TegxWTXG6BwItNQo8gd+pZzf/MA==,
+        integrity: sha512-K0citnz9bSecPCLl4jGfE5I5St+E9XtDmOvYqq3ranGZGZ2Mvs5RwgUkaOrn4rulvUmBGBl7Exwh5YX9PONrEQ==,
       }
     peerDependencies:
       vite: ">=6.0"
@@ -2256,10 +2268,10 @@ packages:
       }
     hasBin: true
 
-  "@nuxt/devtools-wizard@2.3.1":
+  "@nuxt/devtools-wizard@2.3.2":
     resolution:
       {
-        integrity: sha512-FqJVncQ9XiVR3uVwnqxHysCShfwrsK8JL4Q8rNrQoY9ly0Q7h6vimX44asFZSSCQ25WYo74PikdvVKV/bZW+qg==,
+        integrity: sha512-vrGjcb7O/ojrWM9FXjAyWgMLUTkb9bmQUCXc//wZw8YnJLR/hmmvo0XFwmz31BN7nMLZaMpUclROdlhRSPNf1Q==,
       }
     hasBin: true
 
@@ -2272,10 +2284,10 @@ packages:
     peerDependencies:
       vite: "*"
 
-  "@nuxt/devtools@2.3.1":
+  "@nuxt/devtools@2.3.2":
     resolution:
       {
-        integrity: sha512-SA/ShgsB/E1DMAC7BZI6sP00djvOXfhrwaqdpb1rNNOqNJ/JX1oc+LVNtKTPAzxUouDsv5sAeEVdPT5enync2g==,
+        integrity: sha512-MMx7pUW0aPDRmhe3jy91srEiFWq/Q70rjbGoHhzpVosuvyvy/fi0oKOFQqN5V4V7jJLiEx4HAoD0QdqP0I6xBA==,
       }
     hasBin: true
     peerDependencies:
@@ -2516,6 +2528,20 @@ packages:
         integrity: sha512-eAuL+x1oBbodJksPm4UpFU57A6z1n1rx9JNpD87CObwtbRf5EzW29Ofd0t057bPGcHc8cYZtZzJ69dcRQ9xGdg==,
       }
     engines: { node: ">=18.17.0", npm: ">=9.5.0" }
+
+  "@reduxjs/toolkit@2.6.1":
+    resolution:
+      {
+        integrity: sha512-SSlIqZNYhqm/oMkXbtofwZSt9lrncblzo6YcZ9zoX+zLngRBrCOjK4lNLdkNucJF58RHOWrD9txT3bT3piH7Zw==,
+      }
+    peerDependencies:
+      react: ^16.9.0 || ^17.0.0 || ^18 || ^19
+      react-redux: ^7.2.1 || ^8.1.3 || ^9.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
+      react-redux:
+        optional: true
 
   "@rollup/plugin-alias@5.1.1":
     resolution:
@@ -3509,6 +3535,12 @@ packages:
     resolution:
       {
         integrity: sha512-ko/gIFJRv177XgZsZcBwnqJN5x/Gien8qNOn0D5bQU/zAzVf9Zt3BlcUiLqhV9y4ARk0GbT3tnUiPNgnTXzc/Q==,
+      }
+
+  "@types/use-sync-external-store@0.0.6":
+    resolution:
+      {
+        integrity: sha512-zFDAD+tlpf2r4asuHEj0XH6pY6i0g5NeAHPn+15wk3BV6JA69eERFXC1gyGThDkVa1zCyKr5jox1+2LbV/AMLg==,
       }
 
   "@types/web-bluetooth@0.0.20":
@@ -5131,10 +5163,10 @@ packages:
         integrity: sha512-5WeXXAvTmitV1RqJFppT5QtUiz2p1mRSYU000Jkft5ZUCLJIk4uQriYNO50HknxKwM6jd8utNc66K1qGIwwWBQ==,
       }
 
-  birpc@2.2.0:
+  birpc@2.3.0:
     resolution:
       {
-        integrity: sha512-1/22obknhoj56PcE+pZPp6AbWDdY55M81/ofpPW3Ltlp9Eh4zoFFLswvZmNpRTb790CY5tsNfgbYeNOqIARJfQ==,
+        integrity: sha512-ijbtkn/F3Pvzb6jHypHRyve2QApOCZDR25D/VnkY2G/lBNcXCTsnsCxgY4k4PkVB7zfwzYbY3O9Lcqe3xufS5g==,
       }
 
   bl@1.2.3:
@@ -9685,6 +9717,12 @@ packages:
       }
     engines: { node: ">=18" }
 
+  immer@10.1.1:
+    resolution:
+      {
+        integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==,
+      }
+
   import-cwd@2.1.0:
     resolution:
       {
@@ -14233,6 +14271,21 @@ packages:
     peerDependencies:
       react: ^19.0.0
 
+  react-redux@9.2.0:
+    resolution:
+      {
+        integrity: sha512-ROY9fvHhwOD9ySfrF0wmvu//bKCQ6AeZZq1nJNtbDC+kk5DuSuNX/n6YWYF/SYy7bSba4D4FSz8DJeKY/S/r+g==,
+      }
+    peerDependencies:
+      "@types/react": ^18.2.25 || ^19
+      react: ^18.0 || ^19
+      redux: ^5.0.0
+    peerDependenciesMeta:
+      "@types/react":
+        optional: true
+      redux:
+        optional: true
+
   react-router-dom@7.4.0:
     resolution:
       {
@@ -14337,6 +14390,20 @@ packages:
         integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==,
       }
     engines: { node: ">=4" }
+
+  redux-thunk@3.1.0:
+    resolution:
+      {
+        integrity: sha512-NW2r5T6ksUKXCabzhL9z+h206HQw/NJkcLm1GPImRQ8IzfXwRGqjVhKJGauHirT0DAuyy6hjdnMZaRoAcy0Klw==,
+      }
+    peerDependencies:
+      redux: ^5.0.0
+
+  redux@5.0.1:
+    resolution:
+      {
+        integrity: sha512-M9/ELqF6fy8FwmkpnF0S3YKOqMyoWJ4+CS5Efg2ct3oY9daQvd/Pc71FpGZsVsbl3Cpb+IIcjBDUnnyBdQbq4w==,
+      }
 
   reflect.getprototypeof@1.0.10:
     resolution:
@@ -14567,6 +14634,12 @@ packages:
     resolution:
       {
         integrity: sha512-KigOCHcocU3XODJxsu8i/j8T9tzT4adHiecwORRQ0ZZFcp7ahwXuRU1m+yuO90C5ZUyGeGfocHDI14M3L3yDAQ==,
+      }
+
+  reselect@5.1.1:
+    resolution:
+      {
+        integrity: sha512-K/BG6eIky/SBpzfHZv/dd+9JBFiS4SWV7FIujVyJRux6e45+73RaUHXLmIR1f7WOMaQ0U1km6qwklRQxpJJY0w==,
       }
 
   reserved-identifiers@1.0.0:
@@ -16939,6 +17012,14 @@ packages:
         integrity: sha512-Qp95D4TPJl1kC9SKigDcqgyM2VDVO4RiJc2d4qe5GrYm+zbIQCWWKAFaJNQ4BhdFeDGwBmAxqJBwWSJDb9T3BQ==,
       }
 
+  use-sync-external-store@1.4.0:
+    resolution:
+      {
+        integrity: sha512-9WXSPC5fMv61vaupRkCKCxsPxBocVnwakBEkMIHHpkTTg6icbJtg6jzgtLDm4bl3cSHAca52rYWih0k4K3PfHw==,
+      }
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   use@3.1.1:
     resolution:
       {
@@ -17188,10 +17269,10 @@ packages:
     peerDependencies:
       vite: ^3.0.0-0 || ^4.0.0-0 || ^5.0.0-0 || ^6.0.0-0
 
-  vite-plugin-vue-tracer@0.1.1:
+  vite-plugin-vue-tracer@0.1.3:
     resolution:
       {
-        integrity: sha512-8BuReHmbSPd6iRQDQhlyK5+DexY1Hmb4K0GUVo9Te1Yaz8gyOZspBm9qdG1SvebdSIKw3WNlzpdstJ47TJ4bOw==,
+        integrity: sha512-+fN6oo0//dwZP9Ax9gRKeUroCqpQ43P57qlWgL0ljCIxAs+Rpqn/L4anIPZPgjDPga5dZH+ZJsshbF0PNJbm3Q==,
       }
     peerDependencies:
       vite: ^6.0.0
@@ -19696,7 +19777,7 @@ snapshots:
       - magicast
       - supports-color
 
-  "@nuxt/devtools-kit@2.3.1(magicast@0.3.5)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))":
+  "@nuxt/devtools-kit@2.3.2(magicast@0.3.5)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))":
     dependencies:
       "@nuxt/kit": 3.16.1(magicast@0.3.5)
       "@nuxt/schema": 3.16.1
@@ -19718,7 +19799,7 @@ snapshots:
       rc9: 2.1.2
       semver: 7.7.1
 
-  "@nuxt/devtools-wizard@2.3.1":
+  "@nuxt/devtools-wizard@2.3.2":
     dependencies:
       consola: 3.4.2
       diff: 7.0.0
@@ -19776,14 +19857,14 @@ snapshots:
       - utf-8-validate
       - vue
 
-  "@nuxt/devtools@2.3.1(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))":
+  "@nuxt/devtools@2.3.2(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))":
     dependencies:
-      "@nuxt/devtools-kit": 2.3.1(magicast@0.3.5)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))
-      "@nuxt/devtools-wizard": 2.3.1
+      "@nuxt/devtools-kit": 2.3.2(magicast@0.3.5)(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))
+      "@nuxt/devtools-wizard": 2.3.2
       "@nuxt/kit": 3.16.1(magicast@0.3.5)
       "@vue/devtools-core": 7.7.2(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       "@vue/devtools-kit": 7.7.2
-      birpc: 2.2.0
+      birpc: 2.3.0
       consola: 3.4.2
       destr: 2.0.3
       error-stack-parser-es: 1.0.5
@@ -19808,7 +19889,7 @@ snapshots:
       tinyglobby: 0.2.12
       vite: 6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0)
       vite-plugin-inspect: 11.0.0(@nuxt/kit@3.16.1(magicast@0.3.5))(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))
-      vite-plugin-vue-tracer: 0.1.1(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
+      vite-plugin-vue-tracer: 0.1.3(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3))
       which: 5.0.0
       ws: 8.18.1
     transitivePeerDependencies:
@@ -20103,6 +20184,16 @@ snapshots:
       yaml-ast-parser: 0.0.43
     transitivePeerDependencies:
       - supports-color
+
+  "@reduxjs/toolkit@2.6.1(react-redux@9.2.0(@types/react@19.0.8)(react@19.0.0)(redux@5.0.1))(react@19.0.0)":
+    dependencies:
+      immer: 10.1.1
+      redux: 5.0.1
+      redux-thunk: 3.1.0(redux@5.0.1)
+      reselect: 5.1.1
+    optionalDependencies:
+      react: 19.0.0
+      react-redux: 9.2.0(@types/react@19.0.8)(react@19.0.0)(redux@5.0.1)
 
   "@rollup/plugin-alias@5.1.1(rollup@4.34.6)":
     optionalDependencies:
@@ -20629,6 +20720,8 @@ snapshots:
   "@types/unist@2.0.11": {}
 
   "@types/unist@3.0.3": {}
+
+  "@types/use-sync-external-store@0.0.6": {}
 
   "@types/web-bluetooth@0.0.20": {}
 
@@ -22068,7 +22161,7 @@ snapshots:
 
   birpc@0.2.19: {}
 
-  birpc@2.2.0: {}
+  birpc@2.3.0: {}
 
   bl@1.2.3:
     dependencies:
@@ -25168,6 +25261,8 @@ snapshots:
       slash: 5.1.0
       uint8array-extras: 1.4.0
 
+  immer@10.1.1: {}
+
   import-cwd@2.1.0:
     dependencies:
       import-from: 2.1.0
@@ -28181,6 +28276,15 @@ snapshots:
       react: 19.0.0
       scheduler: 0.25.0
 
+  react-redux@9.2.0(@types/react@19.0.8)(react@19.0.0)(redux@5.0.1):
+    dependencies:
+      "@types/use-sync-external-store": 0.0.6
+      react: 19.0.0
+      use-sync-external-store: 1.4.0(react@19.0.0)
+    optionalDependencies:
+      "@types/react": 19.0.8
+      redux: 5.0.1
+
   react-router-dom@7.4.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       react: 19.0.0
@@ -28257,6 +28361,12 @@ snapshots:
   redis-parser@3.0.0:
     dependencies:
       redis-errors: 1.2.0
+
+  redux-thunk@3.1.0(redux@5.0.1):
+    dependencies:
+      redux: 5.0.1
+
+  redux@5.0.1: {}
 
   reflect.getprototypeof@1.0.10:
     dependencies:
@@ -28476,6 +28586,8 @@ snapshots:
   require-main-filename@2.0.0: {}
 
   requires-port@1.0.0: {}
+
+  reselect@5.1.1: {}
 
   reserved-identifiers@1.0.0: {}
 
@@ -30019,6 +30131,10 @@ snapshots:
 
   urlpattern-polyfill@8.0.2: {}
 
+  use-sync-external-store@1.4.0(react@19.0.0):
+    dependencies:
+      react: 19.0.0
+
   use@3.1.1: {}
 
   util-deprecate@1.0.2: {}
@@ -30101,7 +30217,7 @@ snapshots:
 
   vite-dev-rpc@1.0.7(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0)):
     dependencies:
-      birpc: 2.2.0
+      birpc: 2.3.0
       vite: 6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0)
       vite-hot-client: 2.0.4(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))
 
@@ -30220,9 +30336,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  vite-plugin-vue-tracer@0.1.1(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3)):
+  vite-plugin-vue-tracer@0.1.3(vite@6.1.0(@types/node@18.19.75)(jiti@2.4.2)(less@4.2.2)(lightningcss@1.29.1)(terser@5.38.1)(yaml@2.7.0))(vue@3.5.13(typescript@5.7.3)):
     dependencies:
       estree-walker: 3.0.3
+      exsolve: 1.0.4
       magic-string: 0.30.17
       pathe: 2.0.3
       source-map-js: 1.2.1

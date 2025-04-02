@@ -18,7 +18,7 @@ module.exports = {
     alias: {
       src: path.resolve(__dirname, "src"),
     },
-    extensions: [".ts", ".tsx", ".js", ".jsx", "css"], // 确保处理 TS 和 TSX 文件
+    extensions: [".ts", ".tsx", ".js", ".jsx", ".css"], // 确保处理 TS 和 TSX 文件
   },
   module: {
     rules: [

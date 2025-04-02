@@ -112,3 +112,96 @@ options配置参考 :c-link{name=critters href=https://github.com/alan-agius4/cr
 #### 代码优化
 
 分离第三方代码；提取公用代码；遵循编程规范；垃圾回收，定时器清理等
+
+#### 监听页面性能的方式
+
+1. 核心性能指标
+
+- 加载性能：
+
+  - `首次内容绘制（FMP）`：用户首次看到有意义内容的时间
+  - `TTFB（Time to First Byte）`：从请求到服务器响应首字节的时间，反映后端性能
+  - `LCP（Largest Contentful Paint)`：最大内容元素加载完成时间，衡量页面加载速度
+  - `DOMContentLoad 和 Load `：分别表示 DOM 完成解析和所有资源加载完成的时间
+
+- 渲染性能：
+
+  - `FPS（Frames Per Second）`：帧率，低于 60 表示卡顿
+  - `卡顿时长`：连续 5 帧以上渲染时间超过 50ms 的总时长
+
+- 资源性能：
+
+  - `JS/CSS/图片加载时间`：通过 PerformanceObserver 监听资源加载事件
+  - `资源加载失败率` ：统计 4xx/5xx 状态码的请求
+
+- 用户行为指标：
+  - `页面停留时间`：通过 pagehide 或 visibilitychange 事件计算
+  - `用户点击热力图`：通过监听 click 事件记录用户行为
+
+2. 测量方式
+
+(1) 使用 `performance.timing` API监听 `TTFB`
+
+```js
+const ttfb =
+  performance.timing.responseStart - performance.timing.navigationStart;
+// 获取页面加载总耗时
+const loadTime =
+  performance.timing.loadEventEnd - performance.timing.navigationStart;
+```
+
+(2) 使用 `web-vitals` 监听LCP
+
+```js
+import { getLCP } from "web-vitals";
+getLCP((metric) => {
+  console.log("LCP:", metric.value);
+});
+```
+
+(3) 通过 `requestAnimationFrame` 计算帧率
+
+```js
+let last = performance.now();
+let fpsCount = 0;
+function monitorFps() {
+  let now = performance.now();
+  let delta = now - last;
+  if (delta < 1000) {
+    fpsCount++;
+  } else {
+    const fps = fpsCount;
+    fpsCount = 0;
+    last = now;
+    console.log(fps);
+  }
+  requestAnimationFrame(monitorFps);
+}
+monitorFps();
+```
+
+(4) 使用 `PerformanceObserver` 检测资源加载时间
+
+```js
+const observer = new PerformanceObserver((list) => {
+  list.getEntries().forEach((entry) => {
+    if (entry.entryType === "resource") {
+      const loadTime = entry.duration;
+      console.log(entry.name, loadTime);
+    }
+  });
+});
+
+observer.observe({ type: "resource", buffered: true });
+```
+
+(5) 异常上报 `unhandledrejection` 、 `onerror` 、 `try catch`
+
+(6) 定时上报
+
+```js
+setInterval(() => {
+  const data = { fps: currentFPS, memory: performance.memory.usedJSHeapSize };
+  console.log(data);
+}, 5000);
+```

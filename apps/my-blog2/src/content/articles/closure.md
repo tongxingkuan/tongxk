@@ -167,3 +167,21 @@ for (var i = 0; i < 10; i++) {
 ### 闭包的缺点
 
 由于垃圾回收器不会回收闭包中的变量，于是就造成了`内存泄露`，内存泄露积累多了就会导致`内存溢出`。
+
+### 面试题
+
+编写一个sum，实现 sum(1)(2)(3).sumOf() = 6; sum(1, 2)(3).sumOf() = 6
+
+```js
+function sum(...args) {
+  let total = 0;
+  const fn = function (...nums) {
+    nums.forEach((i) => (total += i));
+    return fn;
+  };
+  fn.sumOf = function () {
+    return total;
+  };
+  return fn(...args);
+}
+```
