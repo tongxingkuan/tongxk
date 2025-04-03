@@ -98,3 +98,7 @@ export async function bootstrap() {
   });
 }
 ```
+
+### bem命名规范
+
+`block__element--modify`

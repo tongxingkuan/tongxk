@@ -37,6 +37,7 @@
       "**/CVS": true,
       "**/.DS_Store": true,
       "**/Thumbs.db": true,
+      "**/rules/**": true,
       "apps/my-blog": true,
       "apps/my-blog2": true,
       "packages/shared": true,
