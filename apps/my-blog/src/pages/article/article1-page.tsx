@@ -1,61 +1,48 @@
 import { createComponent } from 'shared'
-import { useBrowserInterceptor } from 'src/lib/use-browser-interceptor'
-import { ref } from 'vue'
 
 export const Article1Page = createComponent(null, () => {
-  const saved = ref(true)
-  const inputValue = ref('')
-
-  useBrowserInterceptor({
-    popstate: next => {
-      if (!saved.value) {
-        const confirm = window.confirm('请先保存')
-        if (confirm) {
-          saved.value = true
-          next()
+  const proxyArr = new Proxy([1, 2, 3], {
+    get(target, prop, receiver) {
+      return Reflect.get(target, prop, receiver)
+    },
+    set(target, prop, value, receiver) {
+      console.log(`set [${prop as string | number}] 的值为 ${value}`)
+      return Reflect.set(target, prop, value, receiver)
+    },
+    apply(target, thisArg, args) {
+      console.log(`调用数组方法，参数：${args.join(', ')}`)
+      return Reflect.apply(
+        target as unknown as (...args: unknown[]) => unknown,
+        thisArg,
+        args,
+      )
+    },
+    getOwnPropertyDescriptor(target, prop) {
+      const desc = Reflect.getOwnPropertyDescriptor(target, prop)
+      if (typeof desc?.value === 'function') {
+        // 包装数组方法（如 push、splice）
+        return {
+          ...desc,
+          value: (...args: unknown[]) => {
+            console.log(
+              `调用方法 ${prop as string | number}，参数：${args.join(', ')}`,
+            )
+            const result = desc.value.apply(target, args)
+            // 自定义逻辑（如通知变化）
+            console.log('数组变化后:', target)
+            return result
+          },
         }
       }
+      return desc
     },
   })
 
-  const p = new Proxy(
-    {},
-    {
-      get: (_, prop) => {
-        function get(_, prop1) {
-          console.log('get', prop1)
-          return proxy
-        }
-        function apply(_, __, args) {
-          console.log('apply', __, args)
-          return '123'
-        }
-        const proxy = new Proxy(() => {}, { get, apply })
-        return proxy
-      },
-    },
-  )
+  proxyArr.push(1)
+  proxyArr.pop()
+  proxyArr.shift()
 
-  console.log(p.a.b.c())
-
-  const save = () => {
-    saved.value = true
-  }
-  return () => (
-    <div>
-      <input
-        type="text"
-        class="border border-solid rounded h-8 w-50"
-        v-model={inputValue.value}
-        onInput={e => {
-          saved.value = false
-          inputValue.value = (e.target as HTMLInputElement).value
-        }}
-      />
-      <button onClick={save}>save</button>
-      {saved.value && <div>saved</div>}
-    </div>
-  )
+  return () => <div>article1</div>
 })
 
 export default Article1Page
