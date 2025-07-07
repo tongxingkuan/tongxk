@@ -5,3 +5,5 @@ tsconfig.app.tsbuildinfo
 apps/.DS_Store
 **/.DS_Store
 apps/**/*.tar.gz
+.cursorrules
+.cspell/custom-dictionary.txt
