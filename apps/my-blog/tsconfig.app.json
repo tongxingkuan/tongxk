@@ -11,11 +11,5 @@
       "src/*": ["src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "vite.config.ts",
-    "src/lib/sandbox.js"
-  ]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue", "nuxt.config.ts", "content.config.ts"]
 }

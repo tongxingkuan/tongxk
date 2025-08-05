@@ -5,12 +5,12 @@
       "name": "root",
     },
     {
-      "path": "apps/my-blog",
-      "name": "my-blog",
+      "path": "apps/my-vite-app",
+      "name": "my-vite-app",
     },
     {
-      "path": "apps/my-blog2",
-      "name": "my-blog2",
+      "path": "apps/my-blog",
+      "name": "my-blog",
     },
     {
       "path": "packages/shared",
@@ -25,8 +25,8 @@
       "name": "my-react-app",
     },
     {
-      "path": "apps/my-vue2",
-      "name": "my-vue2",
+      "path": "apps/my-vue2-app",
+      "name": "my-vue2-app",
     },
   ],
   "settings": {
@@ -38,12 +38,12 @@
       "**/.DS_Store": true,
       "**/Thumbs.db": true,
       "**/rules/**": true,
+      "apps/my-vite-app": true,
       "apps/my-blog": true,
-      "apps/my-blog2": true,
       "packages/shared": true,
       "packages/preset": true,
       "apps/my-react-app": true,
-      "apps/my-vue2": true,
+      "apps/my-vue2-app": true,
     },
     "search.exclude": {
       "**/node_modules": true,

@@ -1,7 +1,7 @@
 {
   "name": "tongxk",
   "version": "1.0.0",
-  "description": "",
+  "description": "A comprehensive workspace with qiankun micro-frontend architecture",
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
@@ -9,11 +9,36 @@
     "prepare": "husky",
     "common": "pnpm --filter common",
     "app": "pnpm --filter web-app",
+    "shared": "pnpm --filter shared",
+    "shared:build": "pnpm --filter shared build",
+    "shared:dev": "pnpm --filter shared dev",
+    "vite-app": "pnpm --filter my-vite-app",
+    "vite-app:dev": "pnpm --filter my-vite-app dev",
+    "vite-app:build": "pnpm --filter my-vite-app build:prod",
+    "vue2-app": "pnpm --filter my-vue2-app",
+    "vue2-app:dev": "pnpm --filter my-vue2-app dev",
+    "vue2-app:build": "pnpm --filter my-vue2-app build",
+    "react-app": "pnpm --filter my-react-app",
+    "react-app:dev": "pnpm --filter my-react-app dev",
+    "react-app:build": "pnpm --filter my-react-app build",
+    "blog": "pnpm --filter my-blog",
+    "blog:dev": "pnpm --filter my-blog dev",
+    "blog:build": "pnpm --filter my-blog build",
     "webp": "node bin/webp.mjs",
     "config:sync": "find apps -mindepth 1 -maxdepth 1 -type d -exec mkdir -p {}/.vscode/ \\; -exec cp .vscode/*.json {}/.vscode/ \\;",
-    "rm-modules": "find . -type d -name 'node_modules' -exec rm -rf {} \\;"
+    "rm-modules": "find . -type d -name 'node_modules' -exec rm -rf {} \\;",
+    "build:all": "pnpm -r build",
+    "dev:all": "pnpm -r dev",
+    "dev:sub-apps": "pnpm --parallel --filter my-vite-app --filter my-react-app --filter my-vue2-app dev"
   },
-  "keywords": [],
+  "keywords": [
+    "micro-frontend",
+    "qiankun",
+    "vue",
+    "react",
+    "nuxt",
+    "workspace"
+  ],
   "author": "",
   "license": "ISC",
   "devDependencies": {
@@ -24,7 +49,9 @@
     "imagemin-webp": "^8.0.0",
     "lint-staged": "^15.4.3",
     "vue": "^3.2.37",
-    "preset": "workspace:*"
+    "preset": "workspace:*",
+    "eslint": "^9.19.0",
+    "prettier": "^3.4.2"
   },
   "lint-staged": {
     "**/*.{js,ts,tsx}": [

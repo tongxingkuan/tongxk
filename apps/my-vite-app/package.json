@@ -1,0 +1,33 @@
+{
+  "name": "my-vite-app",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host --mode development --no-clearScreen",
+    "build:prod": "vue-tsc -b && vite build --mode production",
+    "build:dev": "vue-tsc -b && vite build --mode development",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.0.3",
+    "preset": "workspace:*",
+    "shared": "workspace:*",
+    "tailwindcss": "^4.0.3",
+    "vite-auto-i18n-plugin": "^1.0.7",
+    "vue": "catalog:",
+    "vue-router": "catalog:"
+  },
+  "devDependencies": {
+    "@vicons/ionicons5": "^0.13.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vitejs/plugin-vue-jsx": "^4.1.1",
+    "@vue/tsconfig": "^0.7.0",
+    "naive-ui": "^2.41.0",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.5",
+    "vite-plugin-markdown": "^2.2.0",
+    "vite-plugin-qiankun": "^1.0.15",
+    "vue-tsc": "^2.2.0"
+  }
+}
