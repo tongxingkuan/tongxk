@@ -25,12 +25,12 @@ export const routes = [
       rs('tsconfig', 'tsconfig', {
         main: () => import('src/pages/article/tsconfig/tsconfig-page'),
       }),
-    ]
+    ],
   ),
 ]
 
 const router = createRouter({
-  history: createWebHistory(qiankunWindow.__POWERED_BY_QIANKUN__ ? '/qiankun/viteApp/' : ''),
+  history: createWebHistory(qiankunWindow.__POWERED_BY_QIANKUN__ ? '/qiankun/viteApp' : ''),
   routes,
 })
 

@@ -111,9 +111,3 @@ window.addEventListener('message', event => {
 
 干货：
 <https://juejin.cn/post/7441617631907397659?searchId=20250212180716617E6F0A269FE8C7B8E8>
-
-### 乾坤子项目
-
-[vue2](/qiankun/vue2App) &nbsp;
-[vue3](/qiankun/viteApp) &nbsp;
-[react](/qiankun/reactApp) &nbsp;

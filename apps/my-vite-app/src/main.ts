@@ -24,11 +24,12 @@ declare global {
 const render = (props: unknown) => {
   console.log('子应用（viteApp）', props)
   const { container } = props as { container: HTMLElement }
+
   app = createApp(App)
   app.use(router)
   app.mount(container ? container.querySelector('#app') : '#app')
   if (qiankunWindow.__POWERED_BY_QIANKUN__) {
-    qiankunWindow._QIANKUN_YD.event.emit('loading', 'vue3')
+    window._QIANKUN_YD.event.emit('loading', 'vue3')
   }
 }
 

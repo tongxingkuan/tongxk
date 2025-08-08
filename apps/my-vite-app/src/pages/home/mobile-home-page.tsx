@@ -1,6 +1,10 @@
-import { createComponent } from 'shared'
-export const MobileHomePage = createComponent(null, () => {
-  return () => <div>MobileHomePage </div>
+import { defineComponent } from 'vue'
+
+export const MobileHomePage = defineComponent({
+  name: 'MobileHomePage',
+  setup() {
+    return () => <div>MobileHomePage </div>
+  },
 })
 
 export default MobileHomePage

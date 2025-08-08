@@ -19,10 +19,10 @@ type ComponentRenderFn<T> = (props: T, context: ComponentContext) => Renderable
 export const createComponent = <T extends ComponentParams, I = unknown>(
   params:
     | (Omit<T, 'slots' | 'props'> & {
-        props?: PropsWithDefaults<T['props']>
-      } & Extra)
+      props?: PropsWithDefaults<T['props']>
+    } & Extra)
     | null,
-  fn: ComponentRenderFn<Required<T['props']> & I>
+  fn: ComponentRenderFn<Required<T['props']> & I>,
 ) => {
   checkProps(params?.props)
   return fn
@@ -41,7 +41,7 @@ function checkProps(props?: object) {
   Object.entries(props).forEach(([key]) => {
     if (key.startsWith('on') && key[2] && /[A-Z]/.test(key[2])) {
       console.warn(
-        `${key} 可能是一个事件，你应该将其放到 emits 中而不是 props 中。只有一些特殊情况你才需要将其放到 props 中，参考文章 https://blog.davy.tw/posts/access-listeners-in-vue3-components/`
+        `${key} 可能是一个事件，你应该将其放到 emits 中而不是 props 中。只有一些特殊情况你才需要将其放到 props 中，参考文章 https://blog.davy.tw/posts/access-listeners-in-vue3-components/`,
       )
     }
   })

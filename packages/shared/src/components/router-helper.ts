@@ -54,10 +54,10 @@ export const redirect = (from: string, to: string): RouteRecordRaw => ({
  * @alias r
  */
 export const newRoute = (
-  _path: string | string[] | { path: string | string[]; name?: string },
+  _path: string | string[] | { path: string | string[], name?: string },
   title: string,
   _component: RouteComponent | (() => RouteComponent | Promise<RouteComponent>) | null,
-  children?: Array<RouteRecordRaw | RouteRecordRaw[]>
+  children?: Array<RouteRecordRaw | RouteRecordRaw[]>,
 ): RouteRecordRaw => {
   const getPath = (p: string | string[]) => (Array.isArray(p) ? p[0] : p)
   const path = _path instanceof Object && 'path' in _path ? getPath(_path.path) : getPath(_path)
@@ -78,8 +78,8 @@ export const newRoute = (
     }
   }
 
-  const name =
-    _path instanceof Object && 'name' in _path && _path.name ? String(_path.name) : createNumberId().toString()
+  const name
+    = _path instanceof Object && 'name' in _path && _path.name ? String(_path.name) : createNumberId().toString()
 
   return {
     path,
@@ -105,7 +105,7 @@ export const newRouteWithComponents = (
   path: string,
   title: string,
   _components: Record<string, RouteComponent | (() => RouteComponent | Promise<RouteComponent>)>,
-  children?: Array<RouteRecordRaw | RouteRecordRaw[]>
+  children?: Array<RouteRecordRaw | RouteRecordRaw[]>,
 ): RouteRecordRaw => {
   const name = path.replace(/^\//g, '').trim() || createStringId('route').toString()
   const components = Object.fromEntries(
@@ -120,7 +120,7 @@ export const newRouteWithComponents = (
             return getComponent(result)
           }
         : getComponent(value),
-    ])
+    ]),
   )
 
   return {

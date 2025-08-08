@@ -5,7 +5,7 @@ export default defineNuxtPlugin(nuxtApp => {
   registerMicroApps(
     [
       {
-        name: 'vite-app',
+        name: 'my-vite-app',
         entry: import.meta.env.DEV ? '//localhost:3001/' : 'http://tongxingkuan.xin:3001/',
         container: '#viteApp',
         activeRule: '/qiankun/viteApp',
