@@ -27,7 +27,15 @@ const render = (props: unknown) => {
 
   app = createApp(App)
   app.use(router)
-  app.mount(container ? container.querySelector('#app') : '#app')
+
+  // 在 qiankun 环境中，直接挂载到容器
+  if (qiankunWindow.__POWERED_BY_QIANKUN__ && container) {
+    app.mount(container)
+  } else {
+    // 独立运行时挂载到 #app
+    app.mount('#app')
+  }
+
   if (qiankunWindow.__POWERED_BY_QIANKUN__) {
     window._QIANKUN_YD.event.emit('loading', 'vue3')
   }

@@ -56,6 +56,8 @@ export default defineNuxtPlugin(nuxtApp => {
   start({
     sandbox: {
       experimentalStyleIsolation: true,
+      prefetch: true, // 启用预加载
+      singular: false, // 允许同时运行多个子应用
     },
   })
 })
