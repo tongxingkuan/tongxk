@@ -108,7 +108,11 @@ const onDocumentTouchStart = event => {
 
 const onDocumentTouchMove = event => {
   if (event.touches.length === 1) {
-    event.preventDefault()
+    // 只有在粒子区域内才阻止默认行为
+    const particleEl = document.getElementById('particle')
+    if (particleEl && particleEl.contains(event.target)) {
+      event.preventDefault()
+    }
     mouseX.value = event.touches[0].pageX - windowHalfX.value
   }
 }
@@ -169,5 +173,6 @@ watch(loading, e => {
   bottom: 0;
   right: 0;
   z-index: -1;
+  pointer-events: none;
 }
 </style>

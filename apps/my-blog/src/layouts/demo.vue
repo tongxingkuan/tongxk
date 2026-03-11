@@ -32,9 +32,9 @@
         </n-breadcrumb>
       </nav>
       <main class="demos">
-        <el-scrollbar style="max-height: calc(100vh - 132px)">
+        <div class="demos-scroll">
           <slot></slot>
-        </el-scrollbar>
+        </div>
       </main>
       <footer class="footer">
         <span class="footer-text">© 2024 童话的博客 · 技术分享 · 实战演示</span>
@@ -234,6 +234,14 @@ const computedRouteList = computed(() => {
   display: block;
   width: auto;
   height: calc(100vh - 132px);
+  overflow: hidden;
+
+  .demos-scroll {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 .footer {
@@ -251,11 +259,11 @@ const computedRouteList = computed(() => {
   }
 }
 
-:global(.el-scrollbar__bar.is-horizontal) {
-  display: none;
-}
-
 @media (max-width: 768px) {
+  .article-layout {
+    touch-action: pan-y;
+  }
+
   .site-header {
     padding: 0 12px;
 
@@ -279,6 +287,11 @@ const computedRouteList = computed(() => {
 
   .demos {
     height: calc(100vh - 136px);
+
+    .demos-scroll {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
   }
 }
 

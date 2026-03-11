@@ -58,7 +58,7 @@
         <main class="w-full h-full overflow-y-auto articles transition-all duration-200">
           <slot></slot>
         </main>
-        <aside v-if="showAnchor" class="md:!block !hidden w-[200px] shrink-0 h-full overflow-y-auto">
+        <aside v-if="showAnchor" class="md:!block !hidden w-[200px] shrink-0 h-full overflow-y-auto anchor-aside">
           <anchorNavigation :navigation-tree="aNavigation"></anchorNavigation>
         </aside>
       </div>
@@ -79,6 +79,8 @@ interface NavigationItem {
   _path: string
   children?: NavigationItem[]
 }
+
+const route = useRoute()
 
 const sidebarCollapsed = ref(false)
 const mobileMenuOpen = ref(false)
@@ -132,8 +134,6 @@ const handleCollapsed = (_collapsed: boolean) => {
 onMounted(() => {
   loadSidebarState()
 })
-
-const route = useRoute()
 
 const aNavigation = ref<TocLink[]>([])
 
@@ -374,6 +374,23 @@ watch(route, () => {
 }
 
 @media (max-width: 768px) {
+  .w-screen.h-screen {
+    overflow: hidden;
+    touch-action: pan-y;
+    max-width: 100vw;
+  }
+
+  .main-content {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .articles {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    max-width: 100%;
+  }
+
   .site-header {
     padding: 0 12px;
 
@@ -458,6 +475,10 @@ watch(route, () => {
     &.menu-open {
       background: linear-gradient(135deg, #f56c6c 0%, #e6a23c 100%);
     }
+  }
+
+  .anchor-aside {
+    display: none !important;
   }
 
   .main-content {
