@@ -14,8 +14,8 @@ export const ArticleLayout = defineComponent({
         currentTitle.value = (router.currentRoute.value.meta?.title as string) || '文章'
       },
       {
-        immediate: true,
-      },
+        immediate: true
+      }
     )
 
     return () => (
@@ -26,7 +26,7 @@ export const ArticleLayout = defineComponent({
         </div>
       </div>
     )
-  },
+  }
 })
 
 export default ArticleLayout

@@ -10,8 +10,8 @@ export default defineNuxtPlugin(nuxtApp => {
         container: '#viteApp',
         activeRule: '/qiankun/viteApp',
         props: {
-          msg: 'hello from parent',
-        },
+          msg: 'hello from parent'
+        }
       },
       {
         name: 'react-app',
@@ -19,8 +19,8 @@ export default defineNuxtPlugin(nuxtApp => {
         container: '#reactApp',
         activeRule: '/qiankun/reactApp',
         props: {
-          msg: 'hello from parent',
-        },
+          msg: 'hello from parent'
+        }
       },
       {
         name: 'vue2-app',
@@ -28,8 +28,8 @@ export default defineNuxtPlugin(nuxtApp => {
         container: '#vue2App',
         activeRule: '/qiankun/vue2App',
         props: {
-          msg: 'hello from parent',
-        },
+          msg: 'hello from parent'
+        }
       },
     ],
     {
@@ -37,28 +37,28 @@ export default defineNuxtPlugin(nuxtApp => {
         app => {
           console.log('before load', app.name)
           return Promise.resolve()
-        },
+        }
       ],
       beforeMount: [
         app => {
           console.log('before mount', app.name)
           return Promise.resolve()
-        },
+        }
       ],
       beforeUnmount: [
         app => {
           console.log('before unmount', app.name)
           return Promise.resolve()
-        },
-      ],
+        }
+      ]
     }
   )
   start({
     sandbox: {
       experimentalStyleIsolation: true,
       prefetch: true, // 启用预加载
-      singular: false, // 允许同时运行多个子应用
-    },
+      singular: false // 允许同时运行多个子应用
+    }
   })
 })
 
@@ -144,7 +144,7 @@ window._QIANKUN_YD = window._QIANKUN_YD || {
       }
     }
     return new Emitter()
-  })(),
+  })()
 }
 
 // 订阅loading事件

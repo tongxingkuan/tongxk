@@ -21,8 +21,8 @@ export const createComponent = <T extends ComponentParams, I = unknown>(
     | (Omit<T, 'slots' | 'props'> & {
       props?: PropsWithDefaults<T['props']>
     } & Extra)
-    | null,
-  fn: ComponentRenderFn<Required<T['props']> & I>,
+    | null
+  fn: ComponentRenderFn<Required<T['props']> & I>
 ) => {
   checkProps(params?.props)
   return fn

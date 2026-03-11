@@ -50,7 +50,7 @@ const initQianKun = () => {
     unmount() {
       app?.unmount()
     },
-    update() {},
+    update() {}
   })
 }
 

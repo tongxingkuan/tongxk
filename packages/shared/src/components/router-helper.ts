@@ -42,7 +42,7 @@ export const redirect = (from: string, to: string): RouteRecordRaw => ({
   path: from,
   redirect: (x: { path: string }) => {
     return { path: to.startsWith('/') ? to : `${x.path}/${to}` }
-  },
+  }
 })
 
 /**
@@ -57,7 +57,7 @@ export const newRoute = (
   _path: string | string[] | { path: string | string[], name?: string },
   title: string,
   _component: RouteComponent | (() => RouteComponent | Promise<RouteComponent>) | null,
-  children?: Array<RouteRecordRaw | RouteRecordRaw[]>,
+  children?: Array<RouteRecordRaw | RouteRecordRaw[]>
 ): RouteRecordRaw => {
   const getPath = (p: string | string[]) => (Array.isArray(p) ? p[0] : p)
   const path = _path instanceof Object && 'path' in _path ? getPath(_path.path) : getPath(_path)

@@ -28,7 +28,7 @@ export const routes = [
 
 const router = createRouter({
   history: createWebHistory(qiankunWindow.__POWERED_BY_QIANKUN__ ? '' : ''),
-  routes: routes as RouteRecordRaw[],
+  routes: routes as RouteRecordRaw[]
 })
 
 export default router

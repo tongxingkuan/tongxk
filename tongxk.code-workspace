@@ -2,32 +2,32 @@
   "folders": [
     {
       "path": ".",
-      "name": "root",
+      "name": "root"
     },
     {
       "path": "apps/my-vite-app",
-      "name": "my-vite-app",
+      "name": "my-vite-app"
     },
     {
       "path": "apps/my-blog",
-      "name": "my-blog",
+      "name": "my-blog"
     },
     {
       "path": "packages/shared",
-      "name": "shared",
+      "name": "shared"
     },
     {
       "path": "packages/preset",
-      "name": "preset",
+      "name": "preset"
     },
     {
       "path": "apps/my-react-app",
-      "name": "my-react-app",
+      "name": "my-react-app"
     },
     {
       "path": "apps/my-vue2-app",
-      "name": "my-vue2-app",
-    },
+      "name": "my-vue2-app"
+    }
   ],
   "settings": {
     "files.exclude": {
@@ -43,60 +43,60 @@
       "packages/shared": true,
       "packages/preset": true,
       "apps/my-react-app": true,
-      "apps/my-vue2-app": true,
+      "apps/my-vue2-app": true
     },
     "search.exclude": {
       "**/node_modules": true,
-      "**/dist": true,
+      "**/dist": true
     },
     "files.associations": {
-      "*.css": "tailwindcss",
+      "*.css": "tailwindcss"
     },
     "editor.quickSuggestions": {
-      "strings": "on",
+      "strings": "on"
     },
     "eslint.format.enable": true,
     "eslint.rules.customizations": [
       {
         "rule": "style/*",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "format/*",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*-indent",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*-spacing",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*-spaces",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*-order",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*-dangle",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*-newline",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*quotes",
-        "severity": "off",
+        "severity": "off"
       },
       {
         "rule": "*semi",
-        "severity": "off",
-      },
+        "severity": "off"
+      }
     ],
     "eslint.validate": [
       "javascript",
@@ -109,19 +109,23 @@
       "json",
       "jsonc",
       "yaml",
-      "toml",
+      "toml"
     ],
     "editor.formatOnSave": true,
     "editor.wordWrap": "off",
     "[javascript]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
     "[typescript]": {
-      "editor.defaultFormatter": "dbaeumer.vscode-eslint",
+      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
     },
     "prettier.enable": false,
-    "cSpell.words": ["qiankun", "sider", "webp"],
+    "cSpell.words": [
+      "qiankun",
+      "sider",
+      "webp"
+    ],
     "liveServer.settings.multiRootWorkspaceName": "root",
-    "liveServer.settings.port": 5501,
-  },
+    "liveServer.settings.port": 5501
+  }
 }

@@ -34,14 +34,14 @@ export const scrollToElement = (element: Element | string, options: ScrollToOpti
     target.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
-      ...options,
+      ...options
     })
   }
 }
 
 export const debounce = <T extends (...args: unknown[]) => void>(
   func: T,
-  wait: number,
+  wait: number
 ): ((...args: Parameters<T>) => void) => {
   let timeout: ReturnType<typeof setTimeout>
   return (...args: Parameters<T>) => {
@@ -52,7 +52,7 @@ export const debounce = <T extends (...args: unknown[]) => void>(
 
 export const throttle = <T extends (...args: unknown[]) => void>(
   func: T,
-  limit: number,
+  limit: number
 ): ((...args: Parameters<T>) => void) => {
   let inThrottle = false
   return (...args: Parameters<T>) => {
