@@ -77,4 +77,17 @@ watch(route, newRoute => {
   padding-left: 8px;
   margin-top: 1px;
 }
+
+@media (max-width: 1024px) {
+  .nav-item {
+    > .nav-link {
+      padding: 4px 6px;
+      font-size: 11px;
+    }
+  }
+
+  .subnavigation {
+    padding-left: 6px;
+  }
+}
 </style>

@@ -54,9 +54,9 @@ const covert = (paths: string[]): Breadcrumb[] => {
 
   const nameMap: Record<string, string> = {
     '': '首页',
-    'demos': '演示',
-    'lazyload': '图片懒加载',
-    'xlegex': 'x了个x',
+    demos: '演示',
+    lazyload: '图片懒加载',
+    xlegex: 'x了个x',
   }
 
   let res: Breadcrumb[] = [],
@@ -65,7 +65,7 @@ const covert = (paths: string[]): Breadcrumb[] => {
   paths.forEach((item, index) => {
     if (index === 0) {
       res.push({
-        name: item ? (nameMap[item] || item) : '首页',
+        name: item ? nameMap[item] || item : '首页',
         path: '/' + item,
       })
     } else {
@@ -268,13 +268,26 @@ const computedRouteList = computed(() => {
     }
 
     .nav-link {
-      padding: 6px 12px;
+      padding: 6px 10px;
       font-size: 13px;
     }
   }
 
   .breadcrumb-nav {
     padding: 0 12px;
+  }
+
+  .demos {
+    height: calc(100vh - 136px);
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header {
+    .nav-link {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
   }
 }
 </style>

@@ -32,7 +32,11 @@
         </div>
       </nav>
       <div class="main-content">
-        <aside v-if="showSidebar" class="sidebar" :class="{ collapsed: sidebarCollapsed }">
+        <aside
+          v-if="showSidebar"
+          class="sidebar"
+          :class="{ collapsed: sidebarCollapsed, 'mobile-open': mobileMenuOpen }"
+        >
           <contentNavigation
             class="sidebar-nav"
             @update:collapsed="handleCollapsed"
@@ -40,6 +44,17 @@
             :collapsed="sidebarCollapsed"
           ></contentNavigation>
         </aside>
+        <!-- 移动端遮罩层 -->
+        <div v-if="showSidebar && mobileMenuOpen" class="sidebar-overlay" @click="closeMobileMenu"></div>
+        <!-- 移动端侧边栏切换按钮 -->
+        <button
+          v-if="showSidebar"
+          class="mobile-menu-btn"
+          @click="toggleMobileMenu"
+          :class="{ 'menu-open': mobileMenuOpen }"
+        >
+          <n-icon :component="mobileMenuOpen ? Close : Menu" :size="20" />
+        </button>
         <main class="w-full h-full overflow-y-auto articles transition-all duration-200">
           <slot></slot>
         </main>
@@ -56,6 +71,8 @@
 <script setup lang="ts">
 import type { TocLink } from '@nuxt/content'
 import { RouterLink } from 'vue-router'
+import { Menu, Close } from '@vicons/ionicons5'
+import { NIcon } from 'naive-ui'
 
 interface NavigationItem {
   title: string
@@ -64,6 +81,25 @@ interface NavigationItem {
 }
 
 const sidebarCollapsed = ref(false)
+const mobileMenuOpen = ref(false)
+
+// 切换移动端菜单
+const toggleMobileMenu = () => {
+  mobileMenuOpen.value = !mobileMenuOpen.value
+}
+
+// 关闭移动端菜单
+const closeMobileMenu = () => {
+  mobileMenuOpen.value = false
+}
+
+// 监听路由变化关闭移动端菜单
+watch(
+  () => route.path,
+  () => {
+    closeMobileMenu()
+  }
+)
 
 // 从 localStorage 读取侧边栏状态
 const STORAGE_KEY = 'my-blog-sidebar-state'
@@ -350,13 +386,97 @@ watch(route, () => {
     }
 
     .nav-link {
-      padding: 6px 12px;
+      padding: 6px 10px;
       font-size: 13px;
     }
   }
 
   .breadcrumb-nav {
     padding: 0 12px;
+
+    .breadcrumb-content {
+      font-size: 12px;
+      gap: 4px;
+    }
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 96px;
+    height: calc(100vh - 132px);
+    z-index: 100;
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+
+    &:not(.collapsed) {
+      transform: translateX(0);
+    }
+
+    &.collapsed {
+      transform: translateX(-100%);
+    }
+
+    &.mobile-open {
+      transform: translateX(0);
+    }
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 96px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 99;
+  }
+
+  .mobile-menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    bottom: 60px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #1785cf 0%, #409eff 100%);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(23, 133, 207, 0.4);
+    z-index: 98;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &.menu-open {
+      background: linear-gradient(135deg, #f56c6c 0%, #e6a23c 100%);
+    }
+  }
+
+  .main-content {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-header {
+    .nav-link {
+      padding: 6px 8px;
+      font-size: 12px;
+    }
+  }
+
+  .breadcrumb-nav {
+    .breadcrumb-content {
+      font-size: 11px;
+    }
   }
 }
 </style>

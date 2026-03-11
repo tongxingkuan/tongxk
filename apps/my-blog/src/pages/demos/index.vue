@@ -89,23 +89,25 @@ definePageMeta({
 const route = useRoute()
 
 // 使用 useAsyncData 获取演示数据，key 包含路由路径以确保路由切换时重新获取
-const { data: demosData, refresh } = await useAsyncData(`demos-${route.path}`, async () => {
-  const demos = await queryContent('demos')
-    .sort({ _file: 1 })
-    .find()
+const { data: demosData, refresh } = await useAsyncData(
+  `demos-${route.path}`,
+  async () => {
+    const demos = await queryContent('demos').sort({ _file: 1 }).find()
 
-  return (demos || []).map(d => ({
-    name: d.title || d._path?.split('/').pop() || '',
-    path: d.path || d._path || '',
-    source: d.source || '',
-    tags: Array.isArray(d.tags) ? d.tags : [],
-    title: d.title,
-    description: d.description,
-    _path: d._path
-  }))
-}, {
-  watch: [route]
-})
+    return (demos || []).map(d => ({
+      name: d.title || d._path?.split('/').pop() || '',
+      path: d.path || d._path || '',
+      source: d.source || '',
+      tags: Array.isArray(d.tags) ? d.tags : [],
+      title: d.title,
+      description: d.description,
+      _path: d._path,
+    }))
+  },
+  {
+    watch: [route],
+  }
+)
 
 // 分页相关
 const demosRef = ref<Demo[]>([])
@@ -121,9 +123,7 @@ const allDemosRef = ref<Demo[]>([])
 const filterDemos = () => {
   let filtered = allDemosRef.value
   if (checkedTags.value.length > 0) {
-    filtered = filtered.filter(demo =>
-      checkedTags.value.every(tag => demo.tags?.includes(tag))
-    )
+    filtered = filtered.filter(demo => checkedTags.value.every(tag => demo.tags?.includes(tag)))
   }
 
   // 更新总数
@@ -143,7 +143,7 @@ const processDemosData = () => {
     // 统计所有标签
     const tagMap = new Map<string, number>()
     allDemosRef.value.forEach(demo => {
-      (demo.tags || []).forEach(tag => {
+      ;(demo.tags || []).forEach(tag => {
         tagMap.set(tag, (tagMap.get(tag) || 0) + 1)
       })
     })
@@ -157,9 +157,13 @@ const processDemosData = () => {
 }
 
 // 监听数据变化
-watch(demosData, () => {
-  processDemosData()
-}, { immediate: true })
+watch(
+  demosData,
+  () => {
+    processDemosData()
+  },
+  { immediate: true }
+)
 
 const tagColorMap = new Map([
   ['vue3', '#67c23a'],
@@ -272,7 +276,9 @@ const changeSelect = (tagName: string) => {
     }
 
     &.checked {
-      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5), 0 4px 12px rgba(0, 0, 0, 0.25);
+      box-shadow:
+        0 0 0 3px rgba(255, 255, 255, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.25);
       transform: scale(1.1);
       position: relative;
       z-index: 1;
@@ -435,9 +441,96 @@ const changeSelect = (tagName: string) => {
     padding: 16px;
   }
 
+  .demos-header {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+
+    .section-title {
+      font-size: 22px;
+
+      .title-icon {
+        font-size: 26px;
+      }
+    }
+
+    .section-desc {
+      font-size: 13px;
+      padding-left: 36px;
+    }
+  }
+
+  .all-demo-tags {
+    padding: 14px;
+    margin-bottom: 16px;
+
+    .tags-header {
+      margin-bottom: 12px;
+
+      .tags-title {
+        font-size: 14px;
+      }
+    }
+
+    .tags-list {
+      gap: 8px;
+    }
+
+    .filter-tag {
+      padding: 5px 12px;
+      font-size: 12px;
+    }
+  }
+
   .demo-list {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+  }
+
+  .demo-item {
+    .demo-link {
+      border-radius: 12px;
+    }
+
+    .demo-info {
+      padding: 12px;
+    }
+
+    .demo-name {
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+
+    .tag-list {
+      gap: 4px;
+
+      .demo-tag {
+        padding: 1px 8px;
+        font-size: 10px;
+      }
+    }
+  }
+
+  .pagination-wrapper {
+    margin-top: 24px;
+
+    :deep(.el-pagination) {
+      .el-pagination__total {
+        display: none;
+      }
+
+      .el-pagination__sizes {
+        display: none;
+      }
+
+      .el-pagination__jump {
+        display: none;
+      }
+
+      .el-pager li {
+        margin: 0 2px;
+        min-width: 28px;
+      }
+    }
   }
 }
 </style>

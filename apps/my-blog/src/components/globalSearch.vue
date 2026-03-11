@@ -141,9 +141,7 @@ const updateResults = (list: any[]) => {
         @blur="handleBlur"
         @input="handleInput"
       />
-      <span class="search-shortcut">
-        <kbd>⌘</kbd><kbd>K</kbd>
-      </span>
+      <span class="search-shortcut"> <kbd>⌘</kbd><kbd>K</kbd> </span>
     </div>
     <ContentList v-if="showDropdown" :query="query" @update:list="updateResults">
       <template #default="{ list }">
@@ -198,15 +196,9 @@ const updateResults = (list: any[]) => {
             </div>
           </template>
           <div class="search-footer">
-            <span class="footer-hint">
-              <kbd>↑</kbd><kbd>↓</kbd> 导航
-            </span>
-            <span class="footer-hint">
-              <kbd>↵</kbd> 确认
-            </span>
-            <span class="footer-hint">
-              <kbd>esc</kbd> 关闭
-            </span>
+            <span class="footer-hint"> <kbd>↑</kbd><kbd>↓</kbd> 导航 </span>
+            <span class="footer-hint"> <kbd>↵</kbd> 确认 </span>
+            <span class="footer-hint"> <kbd>esc</kbd> 关闭 </span>
           </div>
         </div>
       </template>
@@ -456,6 +448,13 @@ const updateResults = (list: any[]) => {
       font-size: 10px;
       color: #666;
     }
+  }
+}
+
+// 移动端适配
+@media (max-width: 768px) {
+  .global-search-wrapper {
+    display: none;
   }
 }
 </style>

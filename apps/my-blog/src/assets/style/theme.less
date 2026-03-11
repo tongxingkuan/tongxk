@@ -163,3 +163,40 @@ table {
     border-left: 1px solid @all-demo-tags-border-color;
   }
 }
+
+// 移动端适配
+@media screen and (max-width: 768px) {
+  // 表格移动端横向滚动
+  .articles,
+  .questions {
+    table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+
+  // 图片移动端自适应
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  // 代码块移动端处理
+  pre {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    code {
+      white-space: pre;
+      overflow-x: visible;
+    }
+  }
+}
+
+// 小屏幕设备适配
+@media screen and (max-width: 480px) {
+  html {
+    font-size: 14px;
+  }
+}
