@@ -717,3 +717,239 @@ useEffect(() => {
 ### 一句话总结
 
 性能优化是系统工程：**指标先行（Web Vitals）→ 定位瓶颈（RUM + DevTools）→ 分层优化（网络 / 资源 / 渲染 / 运行时 / 构建）→ 建立预算和监控防劣化**。面试时讲清楚"在某项目里，通过某指标定位到某瓶颈，用某方案把指标从 X 提升到 Y"比死记条目更打动人。
+
+## Diff 算法相关
+
+> 算法流程与源码解析参见 [Diff 算法](/articles/diff)
+
+### 为什么 key 不能用 index？
+
+使用 index 作为 key，在「列表顺序变化」（如反转、插入、删除中间项）时，React/Vue 会认为 key 相同可以复用，实际却会出现：
+
+- **状态错乱**：非受控组件的内部状态（如 input 的值）会错位。
+- **性能反降**：本来只需要移动的节点，被当成内容变更而触发大量 `patchVnode`，甚至子组件重挂载。
+- **动画失效**：Vue 的 `<transition-group>` 依赖稳定 key 才能正确追踪移动。
+
+**正确做法**：使用业务上稳定且唯一的 ID（如后端返回的主键）。若列表只做追加且不会中途增删，用 index 是安全的。
+
+### 为什么 React 不用双端对比？
+
+根本原因是 **Fiber 是单向链表，没有反向指针**。双端对比需要 O(1) 获取尾节点和上一个兄弟节点，在单链表上实现需要 O(n) 遍历，得不偿失。React 源码 `reconcileChildrenArray` 的注释也明确说明了这一点。
+
+此外，React 的设计哲学是「简单优先」：单轮正向遍历 + Map 查找已经能处理绝大多数场景（列表末尾 push、头部 unshift、中间删除），双端对比带来的收益不足以抵消代码复杂度和 Fiber 改造成本。
+
+### Vue3 为什么要换成最长递增子序列？
+
+Vue2 的双端对比在「局部乱序」场景下高效，但在 **整体乱序** 场景下（如 `[a,b,c,d,e] → [e,c,d,a,b]`）表现不佳，会产生冗余的 DOM 移动。
+
+**LIS（最长递增子序列）** 的本质是：在 `newIndexToOldIndexMap` 中找出一个最长的递增子序列，这个子序列中的节点在新旧列表中的相对顺序未变，因此 **不需要移动**，只需移动序列之外的节点。这是一个 **全局最优解**，保证 DOM 移动次数最少。
+
+- LIS 算法复杂度：`贪心 + 二分` 实现为 O(n log n)，比朴素 DP 的 O(n²) 更优。
+- 代码实现要点：用 `preIndex` 数组记录前驱节点，最后反向回溯修正结果（因为二分替换会破坏原始顺序）。
+
+### Vue3 还有哪些 Diff 相关的优化？
+
+除了 LIS，Vue3 真正的性能跃升来自 **编译期优化**（Vue2 是纯运行时 Diff）：
+
+- **PatchFlag（静态标记）**：编译时为动态节点打上 `PatchFlag`（如 `TEXT=1`、`CLASS=2`、`PROPS=8`、`FULL_PROPS=16`），运行时只 Diff 标记对应的属性，静态属性直接跳过。
+- **Block Tree（区块树）**：将模板按结构指令（`v-if`、`v-for`）切成多个 Block，每个 Block 内部的动态节点被收集到 `dynamicChildren` 数组中。Diff 时直接遍历该扁平数组，**彻底跳过静态节点**，把树级 Diff 降维成线性 Diff。
+- **静态提升（hoistStatic）**：完全静态的节点（包括子树）在渲染函数外创建一次，每次更新直接复用引用，连 VNode 的创建成本都省掉。
+- **Cache Handlers**：事件处理函数缓存，避免重复创建导致的 props Diff。
+
+> 因此「Vue3 比 Vue2 快」主要不是因为 LIS，而是因为 Block Tree 让 Diff 只跑在动态节点上，**大幅减少了 n**。
+
+### Diff 的时间复杂度到底是多少？
+
+- **理论上界**：O(n)，n 为同层节点数（所有框架都遵循「同层比较」假设）。
+- **Vue3 实际复杂度**：
+  - 头尾预处理 O(n)
+  - 构建 keyToNewIndexMap O(n)
+  - 遍历老节点查 Map O(n)
+  - LIS 计算 O(m log m)（m 为乱序区间长度，m ≤ n）
+  - 综合：**O(n + m log m)**，最坏 O(n log n)
+- **React 实际复杂度**：O(n)（Map 查找 + 贪心放置，无排序）。
+- **注意**：这里的 n 不是整棵树节点数，而是 **单层子节点数**。整棵树的 Diff 是 O(total nodes)，因为每一层都是 O(n) 且递归展开。
+
+### 为什么 React 不做 Vue3 的静态提升和 Block Tree？
+
+React 用 JSX，JSX 本质上是 JS 表达式，**编译期无法像 Vue 模板那样做强静态分析**（JSX 中的任何表达式都可能是动态的）。Vue 的模板是 DSL，语法受限反而带来了更强的编译期优化空间。这是两种范式的 tradeoff：
+
+- Vue：模板静态可分析 → 编译期优化激进 → 运行时 Diff 极轻
+- React：JSX 灵活 → 编译期优化有限 → 靠 Fiber 架构和运行时调度（时间切片、优先级）弥补
+
+React 的破局之道是 **React Compiler（React Forget）**，尝试通过编译器自动 memo 化来追平 Vue 的编译期优势。
+
+### 双端对比的本质优势是什么？
+
+双端对比（Vue2）在以下四种高频操作中只需 O(1) 命中：
+
+- 列表末尾追加（尾尾命中）
+- 列表头部插入（头头命中）
+- 整体反转（头尾 / 尾头命中）
+- 首尾单项移动
+
+这些是前端业务中 80% 以上的列表变更场景，因此双端对比在工程上非常划算。它的劣势在于「完全乱序」场景，而 Vue3 的 LIS 正是为补齐这个短板而生。
+
+### patchVnode 做了什么？
+
+patchVnode 是「复用节点」时的内部更新逻辑，并非没有开销：
+
+1. 对比 `props`，更新差异属性（涉及 DOM API 调用）
+2. 对比 `class` / `style` / 事件监听
+3. 递归 Diff 子节点（子节点数组再走一轮同层 Diff）
+4. 触发对应的生命周期 / Hook
+
+所以即使「复用」成功，子树仍会递归 Diff。这也是为什么 `shouldComponentUpdate` / `React.memo` / Vue 的 `v-memo` 仍然有价值——它们能直接剪枝，跳过整棵子树的 Diff。
+
+## Babel 相关
+
+> 编译流程、Plugin/Preset、Polyfill 策略参见 [Babel 解析](/articles/babel)
+
+### Babel 的编译过程分几步？
+
+三步：**解析 → 转换 → 生成**。
+
+1. `@babel/parser` 将源码解析为 AST（先词法分析成 Token 流，再语法分析成树）。
+2. `@babel/traverse` 基于 **访问者模式** 遍历 AST，所有 plugin 的 visitor 合并到一次遍历中执行。
+3. `@babel/generator` 将修改后的 AST 重新打印回代码，并生成 source map。
+
+### Plugin 和 Preset 的执行顺序？
+
+- **Plugin 先于 Preset 执行**
+- **Plugin 从前往后；Preset 从后往前**
+
+例如 `presets: ['@babel/preset-env', '@babel/preset-typescript']` 实际执行顺序是 typescript → env，保证先剥离 TS 类型再降级语法。
+
+注意这不是"插件 A 跑完再跑插件 B"，而是 **逐节点合并**：Babel 为每个 AST 节点收集所有 plugin 的 `enter` 回调，按顺序调用，出栈时反序调用 `exit`。
+
+### Babel 三种 Polyfill 方案区别？
+
+- **`useBuiltIns: 'entry'`**：入口处 `import 'core-js/stable'`，根据 targets 展开全部 polyfill，产物大但可靠。
+- **`useBuiltIns: 'usage'`**：按源码使用情况按需注入，体积小，**会污染全局原型**，默认不扫 `node_modules`。
+- **`@babel/plugin-transform-runtime`**：通过沙盒式引用替代全局 API（`_Promise` 而非 `Promise`），**不污染全局**，适合类库。缺点是无法处理实例方法（如 `[].includes()`）。
+
+**选择建议**：业务项目用 `usage`，NPM 类库用 `transform-runtime`。
+
+### Babel 为什么比 esbuild / SWC 慢？
+
+- **语言**：Babel 是纯 JS，esbuild 是 Go，SWC / Oxc 是 Rust。原生代码本身快数十倍。
+- **并行**：Babel 单线程；Rust/Go 天然多线程。
+- **内存**：Babel AST 节点是 JS 对象，GC 压力大。
+
+但 Babel **插件生态最成熟**，复杂 AST 转换（如国际化抽取、埋点注入）仍首选 Babel。生产构建可用 SWC 加速。
+
+### 手写过 Babel 插件吗？能做什么业务？
+
+一个 Babel 插件本质是一个返回 `{ visitor }` 的函数。典型业务场景：
+
+- **按需引入**：`import { Button } from 'antd'` → `import Button from 'antd/lib/button'`
+- **国际化抽取**：扫描中文字符串字面量，替换为 `i18n.t('key_xxx')`，生成语言包
+- **自动埋点**：在路由组件、点击事件中注入埋点代码
+- **构建时检查**：扫描 `console.log`、`debugger`、TODO 注释并警告
+- **DSL 编译**：Vue SFC、styled-components、React Compiler 的底层都是 Babel 插件
+
+写插件时绕不开 `path.scope`（作用域与变量绑定）和 `path.evaluate()`（常量求值）。
+
+## 前端安全相关
+
+> 攻击场景与防御细节参见 [网络攻击与防范](/articles/xss)
+
+### XSS 防御的纵深分几层？
+
+一道题考察 5 层防御：
+
+1. **输入校验 + 输出编码**：按上下文选编码（HTML 实体、JS 字符串转义、`encodeURIComponent`、CSS 转义）。最容易踩的坑是把 JSON 内联到 `<script>` 没做 `<` → `\u003c`。
+2. **富文本用白名单清洗库**：`DOMPurify`、`xss`，**不要手写正则** 过滤 `<script>`，攻击面太多（`<img onerror>`、`javascript:` 协议、SVG `onload`）。
+3. **CSP**：`Content-Security-Policy` 响应头禁用 `unsafe-inline` / `unsafe-eval`，配合 `nonce` 或 `strict-dynamic` 允许合法内联脚本。
+4. **Trusted Types**：`require-trusted-types-for 'script'`，从浏览器层面禁止字符串直接赋值给 `innerHTML` 等 sink，必须经过 policy 转换。
+5. **Cookie 加固**：`HttpOnly` 防盗、`Secure` 走 HTTPS、`SameSite` 防 CSRF。
+
+### CSRF 与 XSS 的本质区别？
+
+- **XSS** 是 **攻击者的代码跑在受害者的源下**，拥有完整 JS 权限，能窃取信息、伪造任意请求。
+- **CSRF** 是 **受害者被诱导向目标站发请求**，攻击者拿不到响应，只能利用浏览器自动附带的 Cookie 执行写操作（转账、改密码）。
+
+> XSS 是 CSRF 的超集——XSS 得手后可以直接读 token 并发请求，CSRF token 防御就失效了。所以必须 **先把 XSS 堵住**，CSRF 防御才有意义。
+
+### CSRF 有哪几种防御方案？
+
+1. **SameSite Cookie**（浏览器原生）：`Lax`（Chrome 80+ 默认）阻止跨站 `POST`、`iframe`、`XHR` 带 cookie，能覆盖大多数场景。
+2. **CSRF Token**：服务端生成与 session 绑定的随机 token，前端请求必须携带。因同源策略攻击者无法读取。
+3. **Double Submit Cookie**：服务端下发随机值到 Cookie 和响应体，前端通过 header 回传，服务端比对。无状态但需配合 SameSite。
+4. **自定义 header**：触发 CORS 预检（Preflight），跨站页面无法伪造。
+5. **二次校验**：短信验证码、密码确认，阻断自动化。
+
+### 原型链污染是什么？
+
+通过 `__proto__` / `constructor.prototype` 修改 `Object.prototype`，导致所有对象属性被劫持。常见于 `Object.assign(target, JSON.parse(userInput))`、老版 lodash `_.merge`、`Object.setPrototypeOf`。防御：
+
+- 用 `Object.create(null)` 创建无原型对象
+- 关键场景用 `Map` 替代对象
+- 递归合并时过滤 `__proto__`、`constructor`、`prototype` 键
+- 升级到已修复的依赖版本
+
+### SSRF 是什么？前端何时需要关心？
+
+服务端请求伪造：前端传入 URL 让服务端代为请求（如"拉取远程图片"、"URL 预览"），攻击者构造 `http://169.254.169.254/`（云元数据）、`http://127.0.0.1:6379/`（内网 Redis）窃取敏感信息。前端层面：URL 输入要白名单协议，服务端层面要解析后校验 IP 不在内网段。
+
+### 生产环境应该开启哪些安全响应头？
+
+一套基线：
+
+- `Content-Security-Policy` —— 防 XSS
+- `Strict-Transport-Security` —— 强制 HTTPS
+- `X-Content-Type-Options: nosniff` —— 禁止 MIME 嗅探
+- `Referrer-Policy: strict-origin-when-cross-origin` —— 控制 Referer 泄露
+- `Permissions-Policy` —— 关闭不需要的浏览器能力（摄像头、麦克风）
+- `Cross-Origin-Opener-Policy` + `Cross-Origin-Embedder-Policy` —— 启用跨源隔离（防 Spectre，`SharedArrayBuffer` 要求）
+
+可用 [securityheaders.com](https://securityheaders.com/) 扫描自检。
+
+## Web Worker 相关
+
+> 三种 Worker、通信机制、工程实践参见 [Web Worker](/articles/webwork)
+
+### Web Worker 解决了什么问题？
+
+JS 是单线程，一个耗时任务（Excel 解析、加解密、大列表计算）卡住主线程 >16.6ms 就会掉帧。Web Worker 提供独立线程，**不是让代码更快，而是把主线程让给渲染和交互**。
+
+### Dedicated / Shared / Service Worker 区别？
+
+- **Dedicated Worker**：一对一，随页面销毁，最常见。
+- **Shared Worker**：同源多页面共享，适合跨 Tab 通信、共享 WebSocket 连接。
+- **Service Worker**：独立生命周期，可拦截网络请求，PWA 离线缓存的核心。
+
+### postMessage 传递数据有什么代价？
+
+默认用 **结构化克隆算法**，会深拷贝。50MB ArrayBuffer 拷贝约 100ms+，本身就是性能瓶颈。优化手段：
+
+- **Transferable Objects**：`postMessage(data, [buffer])` 转移所有权，零拷贝（0.1ms 级），原线程失去访问权。
+- **SharedArrayBuffer + Atomics**：真正共享同一块内存，无需消息传递。但需要页面启用 **跨源隔离**（`COOP: same-origin` + `COEP: require-corp`），是 Spectre 漏洞后的硬性要求。
+
+### Worker 里能做什么不能做什么？
+
+**能**：`fetch`、`WebSocket`、`IndexedDB`、`OffscreenCanvas`、`WebAssembly`、`crypto`。
+
+**不能**：`window`、`document`、`localStorage`、`alert`、任何 DOM 操作。
+
+### 如何让 Worker 像普通对象一样调用？
+
+用 **Comlink**（Google 出品），基于 `Proxy` 把 Worker 暴露的对象封装成可 `await` 的 RPC 代理，底层仍是 `postMessage`：
+
+```js
+// worker
+expose({ add: (a, b) => a + b })
+// main
+const api = wrap(worker)
+await api.add(1, 2) // 3
+```
+
+### OffscreenCanvas 有什么用？
+
+把 Canvas 2D / WebGL 渲染逻辑整个搬进 Worker，主线程只负责 `transferControlToOffscreen()` 一次。图表、游戏、视频滤镜能彻底释放主线程。ECharts 5+、部分 3D 引擎已支持。
+
+### Worker 不适合的场景？
+
+- **启动成本高**：每个 Worker 有独立 JS 上下文，冷启动几十毫秒 + 1-2MB heap，极短任务划不来。
+- **高频通信**：频繁 `postMessage` 来回，序列化成本可能超过计算收益。
+- **强依赖 DOM 的逻辑**：如模板编译、布局计算，无法迁移。

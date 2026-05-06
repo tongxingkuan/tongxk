@@ -42,29 +42,44 @@ function threeSum(nums) {
 #### 2. 最长的回文子串
 
 ```js
-function longestPalindrome(s) {
-  let maxLen = 0,
-    startIndex = 0,
-    len = s.length
-  for (let i = 0; i < len; i++) {
-    let left = i - 1
-    let len = 1
-    while (s[i + 1] === s[i]) {
-      i++
-      len++
+var longestPalindrome = function (s) {
+  // 预处理：插入分隔符，将奇偶统一处理
+  const str = '#' + s.split('').join('#') + '#'
+  const n = str.length
+  const p = new Array(n).fill(0) // p[i] = 以 i 为中心的回文半径
+  let center = 0,
+    right = 0,
+    maxLen = 0,
+    maxCenter = 0
+
+  for (let i = 0; i < n; i++) {
+    // 快速确定最小半径
+    const mirror = 2 * center - i
+    if (i < right) {
+      p[i] = Math.min(right - i, p[mirror])
     }
-    let right = i + 1
-    while (s[left] === s[right] && left >= 0 && s[right] !== undefined) {
-      left--
-      right++
-      len += 2
+
+    // 尝试扩展
+    while (i + p[i] + 1 < n && i - p[i] - 1 >= 0 && str[i + p[i] + 1] === str[i - p[i] - 1]) {
+      p[i]++
     }
-    if (len > maxLen) {
-      maxLen = len
-      startIndex = left + 1
+
+    // 更新中心和边界
+    if (i + p[i] > right) {
+      center = i
+      right = i + p[i]
+    }
+
+    // 记录最长
+    if (p[i] > maxLen) {
+      maxLen = p[i]
+      maxCenter = i
     }
   }
-  return s.slice(startIndex, startIndex + maxLen)
+
+  // 还原原始字符串
+  const start = (maxCenter - maxLen) / 2
+  return s.substring(start, start + maxLen)
 }
 ```
 
