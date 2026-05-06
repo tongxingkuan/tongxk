@@ -17,7 +17,7 @@ const hotSearches = [
 
 const query = computed<QueryBuilderParams>(() => ({
   path: '/',
-  where: [{ querys: { $contains: queryStr.value } }],
+  where: [{ querys: { $contains: queryStr.value.toLocaleLowerCase() } }],
 }))
 
 // 键盘快捷键

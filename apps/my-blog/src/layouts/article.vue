@@ -204,11 +204,6 @@ watch(route, async ({ params }) => {
     }
   }
 })
-
-// 监听路由变化更新侧边栏
-watch(route, () => {
-  // 侧边栏导航会在computed中自动更新
-})
 </script>
 <style lang="less" scoped>
 .site-header {

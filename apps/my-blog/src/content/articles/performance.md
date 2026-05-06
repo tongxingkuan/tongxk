@@ -203,3 +203,7 @@ setInterval(() => {
   console.log(data)
 }, 5000)
 ```
+
+---
+
+> 面试高频性能优化考点（Web Vitals、构建、网络、资源、运行时、监控等）已统一整理到 [面试题 - 前端性能优化](/articles/interview#前端性能优化面试题)，便于集中复习。

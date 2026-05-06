@@ -144,4 +144,8 @@ ReactDOM.unstable_createRoot(rootEl).render(<App />)
 
 1. `before mutation阶段`：处理DOM节点渲染/删除后的`autoFoucus`、`blur`逻辑；调用 `getSnapshotBeforeUpdate` 生命周期钩子；调度 `useEffect`
 2. `mutation阶段`：遍历 `effectList`，根据`ContentReset effectTag`重置文字节点；更新`ref`；根据`effectTag`分别处理，其中effectTag包括(`Placement` | `Update` | `Deletion` | `Hydrating`)
-3.
+3. `layout阶段`：执行 DOM 操作后触发的钩子，如 `componentDidMount`、`componentDidUpdate`、`useLayoutEffect` 的回调。此阶段 DOM 已经更新，可以安全访问 DOM；之后再把 `workInProgress树` 切换为 `current树`。`useEffect` 的回调则在 commit 之后、下一次浏览器绘制前被异步调度执行，避免阻塞渲染。
+
+---
+
+> React 面试高频问题已统一整理到 [面试题 - React](/articles/interview#react-面试题)，便于集中复习。

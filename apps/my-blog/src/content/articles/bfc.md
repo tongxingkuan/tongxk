@@ -1,7 +1,7 @@
 ---
 title: 'BFC'
 description: 'BFC'
-querys: ['BFC', 'margin合并', '清除浮动']
+querys: ['bfc', 'margin合并', '清除浮动']
 ---
 
 ## 1. 什么是 BFC？

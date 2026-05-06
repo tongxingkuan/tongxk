@@ -1,7 +1,7 @@
 ---
 title: 'Babel 解析'
 description: 'Babel 解析'
-querys: ['Babel', 'Babel 解析', 'preset', 'plugin']
+querys: ['babel', 'preset', 'plugin']
 ---
 
 ## Babel 解析
