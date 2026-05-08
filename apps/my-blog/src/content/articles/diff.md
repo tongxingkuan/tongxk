@@ -697,4 +697,4 @@ for (let i = toBePatched - 1; i >= 0; i--) {
 | 最少移动次数     | ❌ 非最优              | ❌ 非最优           | ✅ 最优（LIS 保证）                   |
 | 可中断           | ✅（Concurrent Mode）  | ❌                  | ❌                                    |
 
-> 相关面试深度问题（key 选择、Fiber 为何不用双端、LIS 复杂度分析、Block Tree 优化等）参见 [面试题 - Diff 算法相关](/articles/interview#diff-算法相关)
+> 相关面试深度问题（key 选择、Fiber 为何不用双端、LIS 复杂度分析、Block Tree 优化等）参见 [面试题 - Diff 算法](/questions/diff)

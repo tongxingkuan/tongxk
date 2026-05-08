@@ -1770,4 +1770,4 @@ export default defineConfig({
 
 ---
 
-> 微前端（qiankun）相关面试高频问题已统一整理到 [面试题 - 微前端（qiankun）](/articles/interview#微前端qiankun面试题)，便于集中复习。
+> 微前端（qiankun）相关面试高频问题已整理到 [面试题 - 微前端（qiankun）](/questions/qiankun)，便于集中复习。

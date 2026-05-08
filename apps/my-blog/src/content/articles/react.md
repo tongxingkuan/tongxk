@@ -148,4 +148,4 @@ ReactDOM.unstable_createRoot(rootEl).render(<App />)
 
 ---
 
-> React 面试高频问题已统一整理到 [面试题 - React](/articles/interview#react-面试题)，便于集中复习。
+> React 面试高频问题已整理到 [面试题 - React](/questions/react)，便于集中复习。

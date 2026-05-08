@@ -55,6 +55,19 @@ const hasActiveDescendant = item => {
   return walk(item.children)
 }
 
+// 扁平化导航树拿到所有 id，供滚动联动查找
+const flattenIds = list => {
+  const ids = []
+  const walk = arr => {
+    arr.forEach(n => {
+      if (n.id) ids.push(n.id)
+      if (n.children) walk(n.children)
+    })
+  }
+  walk(list)
+  return ids
+}
+
 // 把激活项滚动到 anchor 侧边栏可视区中央
 // 用 rAF 双层等待保证 DOM 更新完成后再计算位置，避免被同步布局抖动影响
 const scrollActiveIntoView = targetId => {
@@ -81,6 +94,7 @@ const scrollActiveIntoView = targetId => {
 // 点击同一个 hash 时 route.hash 不变，watch 不会触发，这里兜底处理
 const onLinkClick = id => {
   if (props.depth !== 0) return
+  suppressScrollSync()
   // 延迟到路由更新后执行；同 hash 点击则立即执行
   nextTick(() => scrollActiveIntoView(id))
 }
@@ -93,8 +107,78 @@ watch(
   }
 )
 
+// 滚动联动：监听主内容滚动，根据当前位置更新选中态
+let scrollContainer = null
+let ticking = false
+let isSyncingFromClick = false
+
+const computeActiveId = () => {
+  if (props.depth !== 0 || !scrollContainer) return
+  const ids = flattenIds(props.navigationTree)
+  if (!ids.length) return
+  const cRect = scrollContainer.getBoundingClientRect()
+  // 触发线：容器顶部下方 80px，标题越过该线即视为进入
+  const threshold = cRect.top + 80
+  let activeId = ids[0]
+  for (const id of ids) {
+    const el = document.getElementById(id)
+    if (!el) continue
+    const top = el.getBoundingClientRect().top
+    if (top <= threshold) {
+      activeId = id
+    } else {
+      break
+    }
+  }
+  // 滚到底部时强制选中最后一个
+  if (scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 2) {
+    activeId = ids[ids.length - 1]
+  }
+  const newHash = '#' + activeId
+  if (newHash !== currentHash.value) {
+    currentHash.value = newHash
+    // 同步 URL 但不触发滚动
+    if (history.replaceState) {
+      history.replaceState(null, '', route.path + newHash)
+    }
+    scrollActiveIntoView(activeId)
+  }
+}
+
+const onScroll = () => {
+  if (isSyncingFromClick) return
+  if (ticking) return
+  ticking = true
+  requestAnimationFrame(() => {
+    computeActiveId()
+    ticking = false
+  })
+}
+
+// 点击后短时间内屏蔽滚动联动，避免平滑滚动过程中高亮乱跳
+const suppressScrollSync = () => {
+  isSyncingFromClick = true
+  clearTimeout(suppressScrollSync._t)
+  suppressScrollSync._t = setTimeout(() => {
+    isSyncingFromClick = false
+  }, 800)
+}
+
 onMounted(() => {
   scrollActiveIntoView()
+  if (props.depth !== 0) return
+  scrollContainer = document.querySelector('.articles')
+  if (scrollContainer) {
+    scrollContainer.addEventListener('scroll', onScroll, { passive: true })
+    // 初次计算
+    nextTick(() => computeActiveId())
+  }
+})
+
+onBeforeUnmount(() => {
+  if (scrollContainer) {
+    scrollContainer.removeEventListener('scroll', onScroll)
+  }
 })
 </script>
 
