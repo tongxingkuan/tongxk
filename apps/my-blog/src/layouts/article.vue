@@ -349,6 +349,10 @@ watch(route, async ({ params }) => {
   height: 100%;
 }
 
+.mobile-menu-btn {
+  display: none;
+}
+
 .footer {
   height: 36px;
   display: flex;
