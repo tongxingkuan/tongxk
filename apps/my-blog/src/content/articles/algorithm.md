@@ -16,9 +16,13 @@ function threeSum(nums) {
   nums.sort((a, b) => a - b)
   let i = 0
   while (i < nums.length) {
+    // 先对 i 去重，再计算 left/right，避免指针基于旧 i 错位
+    if (i > 0 && nums[i] === nums[i - 1]) {
+      i++
+      continue
+    }
     let left = i + 1,
       right = nums.length - 1
-    while (nums[i] === nums[i - 1]) i++
     while (left < right) {
       let sum = nums[i] + nums[left] + nums[right]
       if (sum === 0) {

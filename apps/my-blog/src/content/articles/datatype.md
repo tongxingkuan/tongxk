@@ -8,7 +8,7 @@ querys: ['number', 'boolean', 'string', 'undefined', 'null', 'symbol', 'bigInt',
 
 ### 基本数据类型
 
-基本数据类型又称简单数据类型，`ES6`中，包括：`number`、`string`、`undefined`、`null`、`boolean`、`symbol`、`bigInt`，共七种。
+基本数据类型又称简单数据类型，现行 `ECMAScript` 规范中共七种：`number`、`string`、`boolean`、`undefined`、`null`、`symbol`（ES6 引入）、`bigInt`（ES2020 引入）。
 
 ### 引用数据类型
 
@@ -244,10 +244,11 @@ false + '' // 'false'
 
 ###### `endsWith`
 
-查询是否以指定的子字符串结尾，第二个参数指定字符串长度，默认为原始字符串的长度（区分大小写）
+查询是否以指定的子字符串结尾，第二个参数 `endPosition` 指定将原字符串视作该长度后再判断，默认为原始字符串长度（区分大小写）。
 
 ```js
-'hello world'.endsWith('hello', 5) // false
+'hello world'.endsWith('world') // true
+'hello world'.endsWith('hello', 5) // true，把 'hello world' 当作前 5 个字符 'hello' 再判断
 ```
 
 ##### 增

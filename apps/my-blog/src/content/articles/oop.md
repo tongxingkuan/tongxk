@@ -25,12 +25,12 @@ function Person(name, gender, idNumber) {
 }
 
 // 鉴权
-Person.prototype.validate = idNumber => {
+Person.prototype.validate = function (idNumber) {
   return String(this._idNumber) === String(idNumber)
 }
 
 // 吃
-Person.prototype.eat = () => {
+Person.prototype.eat = function () {
   console.log('eat')
 }
 ```

@@ -12,7 +12,7 @@ querys: ['vue', 'vue2', '源码']
 
 #### 初始化Vue对象
 
-其实 `Vue` 就是一个 `Function` ，通过`initMixin`定义原型方法`_init`，`stateMixin`定义原型属性`$data`、`$props`、`$set`、`$get`、`$delete`、`$watch`，此外还有`eventsMixin`、`lifecycleMixin`、`renderMixin`分别初始化了Vue对象原型的事件`$on`、`$emit`、`$once`、`$off`，生命周期`_update`、`$forceUpdate`、`$destroy`，渲染`$nextTick`、`_render`以及解析`ast`并生成渲染函数的工具函数，将在之后实例方法`vm.$createElement`或者`vm._c`中用到。接下来，通过`new Vue(options)`生成一个Vue实例。
+其实 `Vue` 就是一个 `Function` ，通过`initMixin`定义原型方法`_init`，`stateMixin`定义原型属性`$data`、`$props`、`$set`、`$delete`、`$watch`，此外还有`eventsMixin`、`lifecycleMixin`、`renderMixin`分别初始化了Vue对象原型的事件`$on`、`$emit`、`$once`、`$off`，生命周期`_update`、`$forceUpdate`、`$destroy`，渲染`$nextTick`、`_render`以及解析`ast`并生成渲染函数的工具函数，将在之后实例方法`vm.$createElement`或者`vm._c`中用到。接下来，通过`new Vue(options)`生成一个Vue实例。
 
 > `_c`表示使用内部 render 函数，不需要额外的标准化处理，`$createElement`则表示使用的是用户自己编写的 render 函数，需要内部重新进行一次标准化处理，这两个方法最终其实都是调用的 `_createElement` 方法，只是标准函数（即 `_c` ）使用 `simpleNormalizeChildren()` 处理，而用户自定义 render （即 `$createElement`）使用 `normalizeChildren()` 处理。
 

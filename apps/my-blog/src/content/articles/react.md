@@ -114,9 +114,10 @@ update时，具体的步骤如下：
 通过以下代码开启`Concurrent mode`，也就是启用`时间切片`
 
 ```js
-// 通过使用ReactDOM.unstable_createRoot开启Concurrent Mode
-// ReactDOM.render(<App/>, rootEl);
-ReactDOM.unstable_createRoot(rootEl).render(<App />)
+// React 18 起，并发特性默认随 createRoot 开启
+// ReactDOM.render(<App/>, rootEl);  // React 17 及以前的用法，React 18 已弃用
+import { createRoot } from 'react-dom/client'
+createRoot(rootEl).render(<App />)
 ```
 
 #### render阶段

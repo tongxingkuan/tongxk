@@ -22,7 +22,7 @@ link标签接触过前端的同学都已经司空见惯，我们常用 **href** 
     <!-- type -->
     <link rel="stylesheet" href="../style.css" type="text/css" />
     <!-- icon -->
-    <link rel="icon" href="../favicon.icon" />
+    <link rel="icon" href="../favicon.ico" />
   </head>
   <body></body>
 </html>
@@ -113,6 +113,8 @@ _当预加载的是字体资源时，必须加上crossorigin属性_
 
 crossorigin 属性在错误处理方面有不同的行为，取决于属性的取值选项：
 
-- 当 crossorigin 属性值为 `anonymous` 或未设置时，如果跨域资源加载失败，浏览器会忽略加载失败，不会报告任何错误，也不会影响页面的正常渲染。
-- 当 crossorigin 属性值为 `use-credentials` 时，如果跨域资源加载失败，浏览器会在控制台报告错误，并且不会加载跨域资源。这样可以确保在有凭证的情况下，_不加载错误的或未授权的跨域资源_。
-- 当 crossorigin 属性值为 `null` 时，如果跨域资源加载失败，浏览器会在控制台报告错误，并且不加载跨域资源。这种设置适用于当跨域资源加载失败时要显示错误信息，并且 _不加载其他资源_。
+- 当 crossorigin 属性值为 `anonymous`（等价于空字符串） 时，以 CORS 匿名模式请求资源，不携带凭证；若跨域资源加载失败，脚本错误会被隐藏（触发 `Script error.` 以保护隐私）。
+- 当 crossorigin 属性值为 `use-credentials` 时，以 CORS 凭证模式请求资源（携带 Cookie 等）；若服务端未返回正确的 CORS 头，资源加载失败，浏览器会在控制台报告错误。
+- 当未设置 crossorigin 属性时，脚本以 "No CORS" 模式加载，不会进入 CORS 检查；跨域脚本执行出错时，`window.onerror` 只会拿到 `Script error.` 而没有详细堆栈。
+
+> 注意：CORS settings attribute 的合法取值只有 `anonymous` 和 `use-credentials` 两个，并没有 `null` 这个取值。
