@@ -16,7 +16,7 @@ querys:
 
 ## Web Worker 面试题
 
-> 三种 Worker、通信机制、工程实践参见 [Web Worker](/articles/webwork)
+> 三种 Worker、通信机制、工程实践参见 [Web Worker](/articles/webworker)
 
 ### Web Worker 解决了什么问题？
 

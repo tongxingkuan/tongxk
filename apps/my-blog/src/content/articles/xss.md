@@ -14,7 +14,7 @@ querys: ['xss', 'XSS', '网络攻击与防范', 'csrf', 'CSRF']
 
 ### 跨站脚本攻击（XSS）
 
-Cross Site Scripting，区别CSS所以命名XSS，攻击者通过注入恶意`HTML脚本代码`来获取用户的敏感信息。**CSP**可以用于防范XSS攻击，参考文章[http-csp](/articles/http#csp)
+Cross Site Scripting，区别CSS所以命名XSS，攻击者通过注入恶意`HTML脚本代码`来获取用户的敏感信息。**CSP**可以用于防范XSS攻击，参考文章[http-csp](/articles/http#content-security-policy)
 
 #### XSS 本质与危害
 
