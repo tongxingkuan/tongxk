@@ -149,7 +149,7 @@ Hi，大家好！
 
 ### （一）Agent 不是一次生成，而是一个闭环系统
 
-![](https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=ef6a103cd1ab4423b76ca71bd0774156&docGuid=_WYqybJ-OnKZXr)
+![](/img/articles/rte/ef6a103cd1ab4423b76ca71bd0774156.webp)
 要把 Agent 的工作方式讲清楚，一个很有用的框架是 **Perceive / Decide / Act / Feedback** 四个环节。
 
 - **Perceive（先看见世界）**：Agent 需要先读取任务、代码、文档、历史决策、环境状态和已有结果。它的一切判断都依赖当前能看到什么。所以第一层问题不是"模型强不强"，而是系统有没有把关键上下文以 Agent 能消费的方式暴露出来。

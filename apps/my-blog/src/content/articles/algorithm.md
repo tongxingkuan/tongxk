@@ -47,43 +47,34 @@ function threeSum(nums) {
 
 ```js
 var longestPalindrome = function (s) {
-  // 预处理：插入分隔符，将奇偶统一处理
-  const str = '#' + s.split('').join('#') + '#'
-  const n = str.length
-  const p = new Array(n).fill(0) // p[i] = 以 i 为中心的回文半径
-  let center = 0,
-    right = 0,
-    maxLen = 0,
-    maxCenter = 0
+  if (s.length < 2) return s
 
-  for (let i = 0; i < n; i++) {
-    // 快速确定最小半径
-    const mirror = 2 * center - i
-    if (i < right) {
-      p[i] = Math.min(right - i, p[mirror])
-    }
+  let start = 0
+  let maxLength = 1
 
-    // 尝试扩展
-    while (i + p[i] + 1 < n && i - p[i] - 1 >= 0 && str[i + p[i] + 1] === str[i - p[i] - 1]) {
-      p[i]++
-    }
-
-    // 更新中心和边界
-    if (i + p[i] > right) {
-      center = i
-      right = i + p[i]
-    }
-
-    // 记录最长
-    if (p[i] > maxLen) {
-      maxLen = p[i]
-      maxCenter = i
+  // 辅助函数：从中心向两边扩散
+  function expandAroundCenter(left, right) {
+    // 只要左右字符相等，且没越界，就继续扩
+    while (left >= 0 && right < s.length && s[left] === s[right]) {
+      const currentLen = right - left + 1
+      if (currentLen > maxLength) {
+        maxLength = currentLen
+        start = left
+      }
+      left--
+      right++
     }
   }
 
-  // 还原原始字符串
-  const start = (maxCenter - maxLen) / 2
-  return s.substring(start, start + maxLen)
+  for (let i = 0; i < s.length; i++) {
+    // 情况 1：回文串长度是奇数 (中心是一个字符，比如 'aba' 中的 'b')
+    expandAroundCenter(i, i)
+
+    // 情况 2：回文串长度是偶数 (中心是两个字符之间的间隙，比如 'abba' 中的 'bb')
+    expandAroundCenter(i, i + 1)
+  }
+
+  return s.substring(start, start + maxLength)
 }
 ```
 

@@ -4,7 +4,7 @@ Skill 是一种把「专家级工作流」打包给 Agent 使用的能力单元�
 
 下面按从设计哲学 → 结构 → 激活 → 编写 → 边界 → 进阶 → 评测的顺序，讲解 Skill 开发的核心要点。
 
-:c-image-with-thumbnail{alt="渐进式披露示意" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=bba3c423015042f780aba7b3442fb511&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="渐进式披露示意" src="/img/articles/rte/bba3c423015042f780aba7b3442fb511.webp"}
 
 **渐进式披露（Progressive Disclosure）** 是 Skill 区别于传统 Prompt 的核心设计思想：
 
@@ -16,7 +16,7 @@ Skill 是一种把「专家级工作流」打包给 Agent 使用的能力单元�
 
 ## Skill 的结构与安装
 
-:c-image-with-thumbnail{alt="Skill 的结构与安装" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=146d4f42792140a59ac4a738478f03b0&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Skill 的结构与安装" src="/img/articles/rte/146d4f42792140a59ac4a738478f03b0.webp"}
 
 一个 Skill 本质上就是一个**目录**：
 
@@ -32,7 +32,7 @@ my-skill/
 
 ## SKILL.md 的结构
 
-:c-image-with-thumbnail{alt="SKILL.md 的结构" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=e28a7037366d4ca68d27d826b45662c6&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="SKILL.md 的结构" src="/img/articles/rte/e28a7037366d4ca68d27d826b45662c6.webp"}
 
 `SKILL.md` 采用 Frontmatter + Markdown 的混合结构：
 
@@ -52,7 +52,7 @@ description: 一句话回答「这个 Skill 什么时候用、能干什么」
 
 ## Skill 的工作原理
 
-:c-image-with-thumbnail{alt="Skill 的工作原理" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=3dbdd650a58249068a7ead54e22fdf9a&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Skill 的工作原理" src="/img/articles/rte/3dbdd650a58249068a7ead54e22fdf9a.webp"}
 
 运行期的生命周期：
 
@@ -64,7 +64,7 @@ description: 一句话回答「这个 Skill 什么时候用、能干什么」
 
 ## Description——激活的精准度
 
-:c-image-with-thumbnail{alt="Description 激活的精准度" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=f0a5c8ccecb941f294b606ffc47062b7&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Description 激活的精准度" src="/img/articles/rte/f0a5c8ccecb941f294b606ffc47062b7.webp"}
 
 Description 决定了 Skill 的**召回率**与**精确率**：
 
@@ -75,7 +75,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 ## Description 的三大要素
 
-:c-image-with-thumbnail{alt="Description 的三大要素" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=740408b49c884e8ba503a53069902686&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Description 的三大要素" src="/img/articles/rte/740408b49c884e8ba503a53069902686.webp"}
 
 一条可用的 description 通常包含：
 
@@ -87,7 +87,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 ## Description 实例：git-commit-workflow
 
-:c-image-with-thumbnail{alt="Description 实例 git-commit-workflow" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=a0509e290c9644678d0172297c2e4220&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Description 实例 git-commit-workflow" src="/img/articles/rte/a0509e290c9644678d0172297c2e4220.webp"}
 
 以 `git-commit-workflow` 为例，好 description 的写法：
 
@@ -97,7 +97,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 ## Body 的指令编写
 
-:c-image-with-thumbnail{alt="Body 的指令编写" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=ff8242b497ba43f98dec2b4b5a49b189&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Body 的指令编写" src="/img/articles/rte/ff8242b497ba43f98dec2b4b5a49b189.webp"}
 
 正文（Body）写作的几条通用原则：
 
@@ -109,7 +109,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 ## Body 形态一：知识文档型
 
-:c-image-with-thumbnail{alt="Body 形态一：知识文档型" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=3cb7917fe9854b56977379c038ce1dfe&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Body 形态一：知识文档型" src="/img/articles/rte/3cb7917fe9854b56977379c038ce1dfe.webp"}
 
 **知识文档型** Skill 本质是「把领域 Know-How 文档化」：
 
@@ -119,7 +119,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 ## Body 形态二：工作流型
 
-:c-image-with-thumbnail{alt="Body 形态二：工作流型" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=2057bc64dbef459790d7d21558a0d35c&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Body 形态二：工作流型" src="/img/articles/rte/2057bc64dbef459790d7d21558a0d35c.webp"}
 
 **工作流型** Skill 是「把一条操作链固化为 SOP」：
 
@@ -131,7 +131,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 ## Body 实例：TS 严格迁移 Prompt 的改进前后
 
-:c-image-with-thumbnail{alt="TS 严格迁移 Prompt 改进前后" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=b7b28031bdd64f72bf0205b0f5427851&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="TS 严格迁移 Prompt 改进前后" src="/img/articles/rte/b7b28031bdd64f72bf0205b0f5427851.webp"}
 
 通过「改进前 vs 改进后」的对比可以看出 Body 打磨的方向：
 
@@ -148,7 +148,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 哪些无法用脚本解决？需要引入用户决策的、需要引入 Agent 智能化思考的部分。
 
-:c-image-with-thumbnail{alt="脚本自动化职责边界" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=aff50f89e2924665bec86b1e7e35233e&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="脚本自动化职责边界" src="/img/articles/rte/aff50f89e2924665bec86b1e7e35233e.webp"}
 
 **Skill vs 脚本** 的职责划分是开发时最容易踩坑的地方：
 
@@ -160,7 +160,7 @@ Description 决定了 Skill 的**召回率**与**精确率**：
 
 ## 进阶：渐进式加载的两种模式
 
-:c-image-with-thumbnail{alt="渐进式加载的两种模式" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=6969926824b54ecdb834329d8b40c1b6&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="渐进式加载的两种模式" src="/img/articles/rte/6969926824b54ecdb834329d8b40c1b6.webp"}
 
 Skill 命中之后，内部还存在两级渐进式加载：
 
@@ -171,7 +171,7 @@ Skill 命中之后，内部还存在两级渐进式加载：
 
 ## Skill 评测
 
-:c-image-with-thumbnail{alt="Skill 评测" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=f80a29a5c89a476096f4887936cefad8&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="Skill 评测" src="/img/articles/rte/f80a29a5c89a476096f4887936cefad8.webp"}
 
 Skill 写完 ≠ 写好。必须通过评测验证其有效性，关键维度：
 
@@ -182,7 +182,7 @@ Skill 写完 ≠ 写好。必须通过评测验证其有效性，关键维度：
 
 ## 评测原则
 
-:c-image-with-thumbnail{alt="评测原则" src="https://rte.weiyun.baidu.com/wiki/attach/image/api/imageDownloadAddress?attachId=306a683c41a844288515a20ae088a22c&docGuid=l2M_9arzAdFq57"}
+:c-image-with-thumbnail{alt="评测原则" src="/img/articles/rte/306a683c41a844288515a20ae088a22c.webp"}
 
 几条务实的评测原则：
 

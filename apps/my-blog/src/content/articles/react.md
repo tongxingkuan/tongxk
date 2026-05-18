@@ -37,7 +37,7 @@ React从15到16重构了整个架构，原因就是15及以前的版本不支持
 
 #### Reconciler协调器
 
-当`Scheduler`将任务交给`Reconciler`后，`Reconciler`会为变化的虚拟DOM打上代表增/删/更新的标记，整个`Scheduler`与`Reconcile`r的工作都在内存中进行。只有当所有组件都完成`Reconciler`的工作，才会统一交给`Renderer`。
+当`Scheduler`将任务交给`Reconciler`后，`Reconciler`会为变化的虚拟DOM打上代表增/删/更新的标记，整个`Scheduler`与`Reconciler`的工作都在内存中进行。只有当所有组件都完成`Reconciler`的工作，才会统一交给`Renderer`。
 
 #### Renderer渲染器
 
