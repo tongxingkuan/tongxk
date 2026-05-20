@@ -4,8 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { join } from 'node:path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { CatsModule } from './cats/cats.module';
-import { CatEntity } from './cats/entities/cat.entity';
 import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { MonitorModule } from './common/monitor/monitor.module';
 import { appConfig } from './config/app.config';
@@ -42,7 +40,7 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
             database: db.mongoDatabase,
             synchronize: db.synchronize,
             logging: db.logging,
-            entities: [CatEntity],
+            entities: [],
           };
         }
         return {
@@ -50,11 +48,10 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
           database: db.database,
           synchronize: db.synchronize,
           logging: db.logging,
-          entities: [CatEntity, TenantEntity, MemberEntity],
+          entities: [TenantEntity, MemberEntity],
         };
       },
     }),
-    CatsModule.registerAsync(appConfig.asProvider()),
     TenantsModule,
     MembersModule,
     MonitorModule,
