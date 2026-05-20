@@ -57,6 +57,7 @@ const covert = (paths: string[]): Breadcrumb[] => {
     demos: '演示',
     lazyload: '图片懒加载',
     xlegex: 'x了个x',
+    'multi-tenant': '多租户管理系统',
   }
 
   let res: Breadcrumb[] = [],

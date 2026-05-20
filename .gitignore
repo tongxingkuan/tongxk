@@ -7,3 +7,8 @@ apps/.DS_Store
 apps/**/*.tar.gz
 .cursorrules
 .cspell/custom-dictionary.txt
+.env.*
+.env.*.local
+apps/my-nestjs/data/
+*.sqlite
+*.sqlite-journal
