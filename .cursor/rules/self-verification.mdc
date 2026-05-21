@@ -1,0 +1,114 @@
+---
+alwaysApply: true
+---
+
+# 自我验证规范
+
+> **核心原则**：在向用户总结"已完成"前，先自己跑一遍验证。等用户发现问题再回头修，是返工而不是协作。
+
+---
+
+## 项目背景速查
+
+本仓库是 pnpm monorepo（`pnpm-workspace.yaml`），包含以下 app（路径基于仓库根目录）：
+
+- `apps/my-blog` — Nuxt 3 主站（qiankun 主应用）
+- `apps/my-nestjs` — NestJS 后端，TypeORM + sqlite/mongodb 双驱动
+- `apps/my-react-app` / `apps/my-vite-app` / `apps/my-vue2-app` — qiankun 子应用
+- `packages/preset` / `packages/shared` — 共享配置与工具
+
+**没有** `pnpm prod`、`pnpm type-check`、`pnpm dev-pc` 这类脚本，下文用到的命令均以实际 `package.json` 为准。
+
+---
+
+## 验证时机
+
+完成下面任何一类修改后必须自我验证：
+
+1. 涉及业务逻辑、数据流、算法实现的代码变更
+2. 跨多个文件、多个 app 的修改
+3. 修改 entity / dto / 接口契约（前后端联动）
+4. 修改 `packages/preset`、`packages/shared` 等被多处引用的共享代码
+5. 修改 `eslint.config.mjs`、`tsconfig*.json`、`pnpm-workspace.yaml` 等根级配置
+
+仅改注释、文案、README 之类的可跳过运行验证，但仍需做静态验证。
+
+---
+
+## 三层验证
+
+### 1. 静态验证（必做）
+
+按改动落在哪个 app 选命令，**只跑相关 app**，不要全量 `build:all` 浪费时间：
+
+| 改动范围 | 命令（在仓库根目录执行） |
+|---------|------------------------|
+| 仅 `apps/my-nestjs` | `pnpm --filter my-nestjs build` |
+| 仅 `apps/my-blog` | `pnpm --filter my-blog build` |
+| 子应用（react/vite/vue2） | `pnpm --filter <app-name> build` |
+| 跨 app 或共享包 | `pnpm build:all` |
+| 任意 ts/js 改动 | `pnpm lint`（会自动 fix 可修项） |
+
+NestJS 的 `nest build` 自带 `tsc` 类型检查；Nuxt 的 `nuxt build` 同理。无需另外跑 `tsc`。
+
+**失败必须修复后再总结，不得报"已完成"。**
+
+### 2. 逻辑验证（强烈推荐）
+
+对照下面问题自答；不能流畅回答的就回去补：
+
+- **功能**：用户要的是不是真的实现了？边界（空值、未登录、无权限、id 不存在）有没有处理？
+- **数据流**：请求从前端（headers/body/query）→ controller → service → repository → DB，每一步字段名和类型对得上吗？
+- **多驱动一致性**：本项目同时支持 sqlite 和 mongodb，改 entity 或 service 时是否两边都验证过？特别是 `@PrimaryGeneratedColumn('uuid')` vs `@ObjectIdColumn()` 的差异（参考最近一次"租户 id 不存在"问题）。
+- **租户隔离**：成员等带 `tenantId` 的资源，新增的查询是否带上了 `tenantId` 条件？
+- **依赖**：导入路径是否真实存在？同名导出（`MemberMongoEntity` / `MemberSqliteEntity` / `MemberEntity`）是否引用了正确的那个？
+- **微前端**：改动是否影响 qiankun 主子应用通信、路由前缀或 federation 暴露？
+
+### 3. 运行验证（按场景选）
+
+- **NestJS 单测**：`pnpm --filter my-nestjs test`
+- **NestJS e2e**：`pnpm --filter my-nestjs test:e2e`
+- **本地起服务**：
+  - 后端：`pnpm --filter my-nestjs start:dev`
+  - 主应用：`pnpm dev:main-app`
+  - 主+子：`pnpm dev:all-apps`
+- **临时验证脚本**：用 `pnpm tsx scripts/xxx.ts` 或在 `node -e`/heredoc 里跑，**验证完立即删除**，不要留垃圾文件。
+
+涉及外部依赖（真实 mongo、登录态、网络）无法本地跑通时，明确告知用户验证限制并列出建议测试场景，不要含糊带过。
+
+---
+
+## 总结模板
+
+向用户汇报时按这个结构（删掉本次没做的层级）：
+
+```markdown
+已完成：[一句话说清做了什么]
+
+修改文件：
+- path/to/file.ts — [改了什么]
+
+验证：
+- 静态：pnpm --filter my-nestjs build ✅
+- 逻辑：覆盖了空 id / tenant 不存在两个边界
+- 运行：pnpm --filter my-nestjs test ✅（或：未跑，原因 …）
+
+风险/遗留：
+- [可能影响到的其他文件 / 老数据 / 待用户确认项]
+```
+
+---
+
+## 反例
+
+> "改完了，应该没问题。"
+
+没跑构建、没跑 lint、没考虑两个 DB 驱动的差异，等用户上线后报"租户 id 不存在"——这就是上次发生过的事。
+
+## 正例
+
+> "已完成租户删除问题修复。
+> - 静态：`pnpm --filter my-nestjs build` 通过；
+> - 逻辑：mongo 走 `@ObjectIdColumn` 自动生成 \_id，sqlite 走 uuid 主键，两侧 create 路径都核对过；
+> - 运行：未跑 e2e（需真实 mongo），建议你在测试环境验证 create→list→delete 链路；
+> - 遗留：`db.service.ts` seed/import 还在用 randomUUID，同类风险，已在回复中标注。"

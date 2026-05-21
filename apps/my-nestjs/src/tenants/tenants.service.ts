@@ -4,7 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { randomUUID } from 'node:crypto'
 import { Repository } from 'typeorm'
 import { CreateTenantDto, UpdateTenantDto } from './dto/tenant.dto'
 import { TenantEntity } from './entities/tenant.entity'
@@ -31,9 +30,8 @@ export class TenantsService {
       where: { name: dto.name },
     })
     if (exists) throw new ConflictException(`租户名 "${dto.name}" 已存在`)
-    // 显式赋默认值：mongo 版实体没有装饰器默认值，sqlite 版能容忍重复赋值
+    // 不显式赋 id：mongo 由 @ObjectIdColumn 自动生成 ObjectId，sqlite 由 @PrimaryGeneratedColumn('uuid') 自动生成 UUID
     const tenant = this.tenantsRepo.create({
-      id: randomUUID(),
       name: dto.name,
       plan: dto.plan ?? 'free',
       active: true,

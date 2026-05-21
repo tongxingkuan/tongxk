@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { randomUUID } from 'node:crypto'
 import { Repository } from 'typeorm'
 import { TenantsService } from '../tenants/tenants.service'
 import { CreateMemberDto, UpdateMemberDto } from './dto/member.dto'
@@ -31,7 +30,6 @@ export class MembersService {
     // 校验租户存在
     await this.tenantsService.findOne(tenantId)
     const member = this.membersRepo.create({
-      id: randomUUID(),
       tenantId,
       name: dto.name,
       email: dto.email,
