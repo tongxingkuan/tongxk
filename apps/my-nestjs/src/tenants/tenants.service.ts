@@ -4,7 +4,8 @@ import {
   NotFoundException,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { FindOptionsWhere, Repository } from 'typeorm'
+import { idWhere } from '../common/db/id.util'
 import { CreateTenantDto, UpdateTenantDto } from './dto/tenant.dto'
 import { TenantEntity } from './entities/tenant.entity'
 
@@ -20,7 +21,9 @@ export class TenantsService {
   }
 
   async findOne(id: string): Promise<TenantEntity> {
-    const tenant = await this.tenantsRepo.findOne({ where: { id } })
+    const tenant = await this.tenantsRepo.findOne({
+      where: idWhere(id) as FindOptionsWhere<TenantEntity>,
+    })
     if (!tenant) throw new NotFoundException(`租户 ${id} 不存在`)
     return tenant
   }

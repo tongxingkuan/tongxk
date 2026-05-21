@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { FindOptionsWhere, Repository } from 'typeorm'
+import { idWhere } from '../common/db/id.util'
 import { TenantsService } from '../tenants/tenants.service'
 import { CreateMemberDto, UpdateMemberDto } from './dto/member.dto'
 import { MemberEntity } from './entities/member.entity'
@@ -21,7 +22,9 @@ export class MembersService {
   }
 
   async findOne(tenantId: string, id: string): Promise<MemberEntity> {
-    const member = await this.membersRepo.findOne({ where: { id, tenantId } })
+    const member = await this.membersRepo.findOne({
+      where: { ...idWhere(id), tenantId } as FindOptionsWhere<MemberEntity>,
+    })
     if (!member) throw new NotFoundException(`成员 ${id} 不存在于当前租户`)
     return member
   }
