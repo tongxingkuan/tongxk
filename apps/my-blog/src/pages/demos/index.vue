@@ -36,7 +36,17 @@
         <li v-for="demo in demosRef" :key="demo._path || demo.path" class="demo-item">
           <nuxt-link :to="demo.path || demo._path" class="demo-link">
             <div class="demo-image-wrapper">
-              <el-image :src="demo.source" class="demo-image" fit="cover" />
+              <img
+                v-if="demo.source"
+                :src="demo.source"
+                :alt="demo.title || demo.name"
+                class="demo-image"
+                loading="lazy"
+                @error="onImgError"
+              />
+              <div v-else class="demo-image demo-image-placeholder">
+                <span>🖼️</span>
+              </div>
               <div class="demo-overlay">
                 <span class="view-demo">查看演示</span>
               </div>
@@ -187,6 +197,14 @@ const changeSelect = (tagName: string) => {
   // 重新筛选并重置分页
   pageNumRef.value = 1
   filterDemos()
+}
+
+// 图片加载失败兜底：替换为占位图，避免出现裂图
+const FALLBACK_IMG = '/icon.webp'
+const onImgError = (e: Event) => {
+  const img = e.target as HTMLImageElement
+  if (img.src.endsWith(FALLBACK_IMG)) return
+  img.src = FALLBACK_IMG
 }
 </script>
 <style lang="less" scoped>
@@ -348,7 +366,17 @@ const changeSelect = (tagName: string) => {
     left: 0;
     width: 100%;
     height: 100%;
+    object-fit: cover;
     transition: transform 0.4s ease;
+  }
+
+  .demo-image-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #fdf3e3 0%, #fce6d2 100%);
+    font-size: 48px;
+    color: rgba(230, 162, 60, 0.6);
   }
 
   .demo-overlay {
@@ -413,27 +441,6 @@ const changeSelect = (tagName: string) => {
   margin-top: 32px;
   display: flex;
   justify-content: center;
-
-  :deep(.el-pagination) {
-    .el-pager li {
-      border-radius: 8px;
-      margin: 0 4px;
-
-      &.is-active {
-        background: linear-gradient(135deg, #e6a23c 0%, #f56c6c 100%);
-        color: #fff;
-      }
-    }
-
-    .btn-prev,
-    .btn-next {
-      border-radius: 8px;
-    }
-  }
-}
-
-:deep(.el-image__inner) {
-  object-fit: cover;
 }
 
 @media (max-width: 768px) {
