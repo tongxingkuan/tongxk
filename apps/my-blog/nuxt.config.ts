@@ -1,3 +1,5 @@
+import { readdir } from 'node:fs/promises'
+import { resolve } from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -30,8 +32,30 @@ export default defineNuxtConfig({
   },
   nitro: {
     prerender: {
-      failOnError: false,
-      ignore: ['/api/_content'],
+      crawlLinks: true,
+      routes: ['/', '/articles', '/questions', '/demos'],
+    },
+  },
+  hooks: {
+    // 在 prerender:routes 钩子里，按 src/content 目录结构枚举所有文档路径
+    // 注入到 prerender 队列。这样不依赖列表页 SSR 渲染列表，也不会踩 @nuxt/content
+    // 内部 storage 的 key 命名变化。
+    'nitro:init'(nitro) {
+      nitro.hooks.hook('prerender:routes', async routes => {
+        const root = resolve(__dirname, 'src/content')
+        for (const dir of ['articles', 'questions', 'demos']) {
+          let entries: string[]
+          try {
+            entries = await readdir(resolve(root, dir))
+          } catch {
+            continue
+          }
+          for (const f of entries) {
+            if (!f.endsWith('.md') || f.startsWith('_')) continue
+            routes.add(`/${dir}/${f.replace(/\.md$/, '')}`)
+          }
+        }
+      })
     },
   },
   devServer: {
