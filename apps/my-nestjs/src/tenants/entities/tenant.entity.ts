@@ -1,25 +1,12 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { TenantMongoEntity } from './tenant.mongo.entity'
+import { TenantSqliteEntity } from './tenant.sqlite.entity'
 
 /**
- * 租户实体（sqlite）。
- * 多租户系统的"账户"，每个租户拥有独立的成员与资源。
+ * 根据 DB_TYPE 在运行时选择实体类。
+ * - sqlite（默认）：使用关系库版
+ * - mongodb：使用 ObjectId 版
  */
-@Entity('tenants')
-export class TenantEntity {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+const isMongo = process.env.DB_TYPE === 'mongodb'
 
-  @Column({ unique: true })
-  name!: string;
-
-  /** 计费/规模档位：free / pro / enterprise */
-  @Column({ default: 'free' })
-  plan!: string;
-
-  /** 是否启用 */
-  @Column({ default: true })
-  active!: boolean;
-
-  @CreateDateColumn({ name: 'created_at' })
-  createdAt!: Date;
-}
+export const TenantEntity = isMongo ? TenantMongoEntity : TenantSqliteEntity
+export type TenantEntity = InstanceType<typeof TenantEntity>

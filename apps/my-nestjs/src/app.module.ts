@@ -1,19 +1,19 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { join } from 'node:path';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
-import { MonitorModule } from './common/monitor/monitor.module';
-import { appConfig } from './config/app.config';
-import { databaseConfig, type DatabaseConfig } from './config/database.config';
-import { MemberEntity } from './members/entities/member.entity';
-import { MembersModule } from './members/members.module';
-import { TenantEntity } from './tenants/entities/tenant.entity';
-import { TenantsModule } from './tenants/tenants.module';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { join } from 'node:path'
+import { AppController } from './app.controller'
+import { AppService } from './app.service'
+import { LoggerMiddleware } from './common/middleware/logger.middleware'
+import { MonitorModule } from './common/monitor/monitor.module'
+import { appConfig } from './config/app.config'
+import { databaseConfig, type DatabaseConfig } from './config/database.config'
+import { MemberEntity } from './members/entities/member.entity'
+import { MembersModule } from './members/members.module'
+import { TenantEntity } from './tenants/entities/tenant.entity'
+import { TenantsModule } from './tenants/tenants.module'
 
-const NODE_ENV = process.env.NODE_ENV ?? 'development';
+const NODE_ENV = process.env.NODE_ENV ?? 'development'
 
 @Module({
   imports: [
@@ -40,8 +40,8 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
             database: db.mongoDatabase,
             synchronize: db.synchronize,
             logging: db.logging,
-            entities: [],
-          };
+            entities: [TenantEntity, MemberEntity],
+          }
         }
         return {
           type: 'better-sqlite3' as const,
@@ -49,7 +49,7 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
           synchronize: db.synchronize,
           logging: db.logging,
           entities: [TenantEntity, MemberEntity],
-        };
+        }
       },
     }),
     TenantsModule,
@@ -61,6 +61,6 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes('*')
   }
 }

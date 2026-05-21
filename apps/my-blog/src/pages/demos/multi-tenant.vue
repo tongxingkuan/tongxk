@@ -212,6 +212,12 @@ interface LogEntry {
   ok: boolean
 }
 
+interface ApiError extends Error {
+  status?: number
+  /** 4xx 业务错误（前端可提示用户修正），区别于网络/5xx（服务异常） */
+  isBusiness?: boolean
+}
+
 interface HealthInfo {
   status: string
   uptimeSec: number
@@ -272,6 +278,25 @@ const formatDate = (s: string) => {
   return Number.isNaN(d.getTime()) ? s : d.toLocaleString()
 }
 
+/** 把 HTTP 状态码翻译成更友好的中文提示。 */
+const friendlyError = (status: number, path: string, method: string, serverMsg?: string): string => {
+  if (status === 409) {
+    if (path.startsWith('/tenants') && method === 'POST') return '租户名已存在，请换一个名称'
+    return '资源冲突：' + (serverMsg ?? '同名记录已存在')
+  }
+  if (status === 400) return serverMsg || '参数有误，请检查表单输入'
+  if (status === 401) return '未授权，请检查登录状态'
+  if (status === 403) return '没有权限访问该资源'
+  if (status === 404) {
+    if (path.startsWith('/tenants/') && method === 'GET') return '租户不存在或已被删除'
+    if (path.startsWith('/members/')) return '成员不存在于当前租户'
+    return serverMsg || '资源不存在'
+  }
+  if (status === 500) return '服务端内部错误：' + (serverMsg ?? '请查看 my-nestjs 日志')
+  if (status >= 500) return `服务端异常 (HTTP ${status})`
+  return serverMsg || `HTTP ${status}`
+}
+
 const request = async <T,>(
   path: string,
   options: { method?: string; body?: unknown; tenant?: string } = {}
@@ -293,7 +318,11 @@ const request = async <T,>(
     const text = await res.text()
     const data = text ? JSON.parse(text) : null
     if (!res.ok) {
-      throw new Error(data?.message || `HTTP ${res.status}`)
+      const err: ApiError = new Error(friendlyError(res.status, path, method, data?.message))
+      err.status = res.status
+      // 4xx 是业务错误，不应判定服务挂掉
+      err.isBusiness = res.status >= 400 && res.status < 500
+      throw err
     }
     return data as T
   } catch (e: unknown) {
@@ -312,7 +341,9 @@ const safeRun = async (fn: () => Promise<void>) => {
     await fn()
     serverOk.value = true
   } catch (e: unknown) {
-    serverOk.value = false
+    const err = e as ApiError
+    // 仅当不是业务错误（4xx）时才认为服务异常
+    if (!err.isBusiness) serverOk.value = false
     errorMsg.value = e instanceof Error ? e.message : String(e)
   }
 }
