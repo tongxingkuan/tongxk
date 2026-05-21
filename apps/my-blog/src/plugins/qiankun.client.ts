@@ -6,30 +6,30 @@ export default defineNuxtPlugin(nuxtApp => {
     [
       {
         name: 'my-vite-app',
-        entry: import.meta.env.DEV ? '//localhost:3001/' : 'http://tongxingkuan.xin:3001/',
+        entry: import.meta.env.DEV ? '//localhost:3001/' : 'https://tongxingkuan.xin:3001/',
         container: '#viteApp',
         activeRule: '/qiankun/viteApp',
         props: {
-          msg: 'hello from parent'
-        }
+          msg: 'hello from parent',
+        },
       },
       {
         name: 'react-app',
-        entry: import.meta.env.DEV ? '//localhost:3002/' : 'http://tongxingkuan.xin:3002/',
+        entry: import.meta.env.DEV ? '//localhost:3002/' : 'https://tongxingkuan.xin:3002/',
         container: '#reactApp',
         activeRule: '/qiankun/reactApp',
         props: {
-          msg: 'hello from parent'
-        }
+          msg: 'hello from parent',
+        },
       },
       {
         name: 'vue2-app',
-        entry: import.meta.env.DEV ? '//localhost:3003/' : 'http://tongxingkuan.xin:3003/',
+        entry: import.meta.env.DEV ? '//localhost:3003/' : 'https://tongxingkuan.xin:3003/',
         container: '#vue2App',
         activeRule: '/qiankun/vue2App',
         props: {
-          msg: 'hello from parent'
-        }
+          msg: 'hello from parent',
+        },
       },
     ],
     {
@@ -37,28 +37,28 @@ export default defineNuxtPlugin(nuxtApp => {
         app => {
           console.log('before load', app.name)
           return Promise.resolve()
-        }
+        },
       ],
       beforeMount: [
         app => {
           console.log('before mount', app.name)
           return Promise.resolve()
-        }
+        },
       ],
       beforeUnmount: [
         app => {
           console.log('before unmount', app.name)
           return Promise.resolve()
-        }
-      ]
+        },
+      ],
     }
   )
   start({
     sandbox: {
       experimentalStyleIsolation: true,
       prefetch: true, // 启用预加载
-      singular: false // 允许同时运行多个子应用
-    }
+      singular: false, // 允许同时运行多个子应用
+    },
   })
 })
 
@@ -144,7 +144,7 @@ window._QIANKUN_YD = window._QIANKUN_YD || {
       }
     }
     return new Emitter()
-  })()
+  })(),
 }
 
 // 订阅loading事件

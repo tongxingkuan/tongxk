@@ -83,7 +83,9 @@
           <ul v-if="members.length" class="entity-list">
             <li v-for="m in members" :key="m.id" class="entity-item">
               <div class="entity-main">
-                <div class="entity-name">{{ m.name }} <span class="email">{{ m.email }}</span></div>
+                <div class="entity-name">
+                  {{ m.name }} <span class="email">{{ m.email }}</span>
+                </div>
                 <div class="entity-sub">
                   <span class="badge" :class="`role-${m.role}`">{{ m.role }}</span>
                   <span class="entity-meta">{{ formatDate(m.createdAt) }}</span>
@@ -104,9 +106,7 @@
       <header class="panel-header">
         <h3>📊 服务端监控</h3>
         <div class="header-tools">
-          <label class="poll-toggle">
-            <input type="checkbox" v-model="autoPoll" /> 自动轮询(5s)
-          </label>
+          <label class="poll-toggle"> <input type="checkbox" v-model="autoPoll" /> 自动轮询(5s) </label>
           <button class="ghost" @click="loadMonitor">刷新</button>
           <button class="ghost" @click="resetMetrics">重置指标</button>
         </div>
@@ -127,7 +127,9 @@
           <div class="metric-card">
             <div class="metric-label">请求总数</div>
             <div class="metric-value">{{ metrics?.totalRequests ?? 0 }}</div>
-            <div class="metric-sub">错误 {{ metrics?.totalErrors ?? 0 }} ({{ ((metrics?.errorRate ?? 0) * 100).toFixed(1) }}%)</div>
+            <div class="metric-sub">
+              错误 {{ metrics?.totalErrors ?? 0 }} ({{ ((metrics?.errorRate ?? 0) * 100).toFixed(1) }}%)
+            </div>
           </div>
           <div class="metric-card">
             <div class="metric-label">堆内存</div>
@@ -237,9 +239,7 @@ interface MetricsInfo {
   routes: RouteMetric[]
 }
 
-const DEFAULT_API_BASE = import.meta.env.DEV
-  ? 'http://localhost:3100'
-  : 'http://tongxingkuan.xin:3100'
+const DEFAULT_API_BASE = import.meta.env.DEV ? 'http://localhost:3100' : 'https://tongxingkuan.xin:3100'
 
 const apiBase = ref(DEFAULT_API_BASE)
 const tenants = ref<Tenant[]>([])
@@ -274,7 +274,7 @@ const formatDate = (s: string) => {
 
 const request = async <T,>(
   path: string,
-  options: { method?: string; body?: unknown; tenant?: string } = {},
+  options: { method?: string; body?: unknown; tenant?: string } = {}
 ): Promise<T> => {
   const method = options.method ?? 'GET'
   const url = `${apiBase.value.replace(/\/$/, '')}${path}`
@@ -335,55 +335,57 @@ const loadMembers = async () => {
   members.value = await request<Member[]>('/members', { tenant: activeTenantId.value })
 }
 
-const loadAll = () => safeRun(async () => {
-  await loadTenants()
-  await loadMembers()
-})
-
-const createTenant = () => safeRun(async () => {
-  if (!tenantForm.name.trim()) return
-  const created = await request<Tenant>('/tenants', {
-    method: 'POST',
-    body: { name: tenantForm.name.trim(), plan: tenantForm.plan },
+const loadAll = () =>
+  safeRun(async () => {
+    await loadTenants()
+    await loadMembers()
   })
-  tenantForm.name = ''
-  await loadTenants()
-  activeTenantId.value = created.id
-  await loadMembers()
-})
 
-const removeTenant = (t: Tenant) => safeRun(async () => {
-  if (!confirm(`确定删除租户 "${t.name}" 及其全部成员？`)) return
-  await request(`/tenants/${t.id}`, { method: 'DELETE' })
-  await loadTenants()
-  await loadMembers()
-})
-
-const createMember = () => safeRun(async () => {
-  if (!activeTenantId.value) return
-  if (!memberForm.name.trim() || !memberForm.email.trim()) return
-  await request<Member>('/members', {
-    method: 'POST',
-    body: { name: memberForm.name.trim(), email: memberForm.email.trim(), role: memberForm.role },
-    tenant: activeTenantId.value,
+const createTenant = () =>
+  safeRun(async () => {
+    if (!tenantForm.name.trim()) return
+    const created = await request<Tenant>('/tenants', {
+      method: 'POST',
+      body: { name: tenantForm.name.trim(), plan: tenantForm.plan },
+    })
+    tenantForm.name = ''
+    await loadTenants()
+    activeTenantId.value = created.id
+    await loadMembers()
   })
-  memberForm.name = ''
-  memberForm.email = ''
-  await loadMembers()
-})
 
-const removeMember = (m: Member) => safeRun(async () => {
-  await request(`/members/${m.id}`, { method: 'DELETE', tenant: activeTenantId.value })
-  await loadMembers()
-})
+const removeTenant = (t: Tenant) =>
+  safeRun(async () => {
+    if (!confirm(`确定删除租户 "${t.name}" 及其全部成员？`)) return
+    await request(`/tenants/${t.id}`, { method: 'DELETE' })
+    await loadTenants()
+    await loadMembers()
+  })
+
+const createMember = () =>
+  safeRun(async () => {
+    if (!activeTenantId.value) return
+    if (!memberForm.name.trim() || !memberForm.email.trim()) return
+    await request<Member>('/members', {
+      method: 'POST',
+      body: { name: memberForm.name.trim(), email: memberForm.email.trim(), role: memberForm.role },
+      tenant: activeTenantId.value,
+    })
+    memberForm.name = ''
+    memberForm.email = ''
+    await loadMembers()
+  })
+
+const removeMember = (m: Member) =>
+  safeRun(async () => {
+    await request(`/members/${m.id}`, { method: 'DELETE', tenant: activeTenantId.value })
+    await loadMembers()
+  })
 
 const loadMonitor = async () => {
   // 监控接口失败不影响主流程，单独捕获
   try {
-    const [h, m] = await Promise.all([
-      request<HealthInfo>('/health'),
-      request<MetricsInfo>('/metrics'),
-    ])
+    const [h, m] = await Promise.all([request<HealthInfo>('/health'), request<MetricsInfo>('/metrics')])
     health.value = h
     metrics.value = m
   } catch {
@@ -391,10 +393,11 @@ const loadMonitor = async () => {
   }
 }
 
-const resetMetrics = () => safeRun(async () => {
-  await request('/metrics', { method: 'DELETE' })
-  await loadMonitor()
-})
+const resetMetrics = () =>
+  safeRun(async () => {
+    await request('/metrics', { method: 'DELETE' })
+    await loadMonitor()
+  })
 
 watch(autoPoll, on => {
   if (pollTimer) {
@@ -427,7 +430,9 @@ onBeforeUnmount(() => {
   color: #e6a23c;
   text-decoration: none;
   font-size: 14px;
-  &:hover { text-decoration: underline; }
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .mt-wrapper {
@@ -472,7 +477,9 @@ onBeforeUnmount(() => {
       background: #fff;
       outline: none;
       transition: border-color 0.2s;
-      &:focus { border-color: #e6a23c; }
+      &:focus {
+        border-color: #e6a23c;
+      }
     }
   }
 }
@@ -491,8 +498,14 @@ onBeforeUnmount(() => {
     border-radius: 10px;
     font-weight: 500;
 
-    &.ok { background: #f0f9eb; color: #67c23a; }
-    &.err { background: #fef0f0; color: #f56c6c; }
+    &.ok {
+      background: #f0f9eb;
+      color: #67c23a;
+    }
+    &.err {
+      background: #fef0f0;
+      color: #f56c6c;
+    }
 
     &::before {
       content: '';
@@ -505,7 +518,9 @@ onBeforeUnmount(() => {
     }
   }
 
-  .status-msg { color: #f56c6c; }
+  .status-msg {
+    color: #f56c6c;
+  }
 }
 
 .panel-grid {
@@ -547,7 +562,9 @@ onBeforeUnmount(() => {
   }
 }
 
-.panel-body { padding: 14px 18px; }
+.panel-body {
+  padding: 14px 18px;
+}
 
 .form-row {
   display: grid;
@@ -568,7 +585,9 @@ onBeforeUnmount(() => {
     font-size: 13px;
     outline: none;
     background: #fff;
-    &:focus { border-color: #e6a23c; }
+    &:focus {
+      border-color: #e6a23c;
+    }
   }
 }
 
@@ -583,8 +602,13 @@ button {
   background: #f4f4f5;
   color: #606266;
 
-  &:hover:not(:disabled) { filter: brightness(0.95); }
-  &:disabled { opacity: 0.5; cursor: not-allowed; }
+  &:hover:not(:disabled) {
+    filter: brightness(0.95);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
   &.primary {
     background: linear-gradient(135deg, #e6a23c, #f56c6c);
@@ -598,7 +622,9 @@ button {
     height: 28px;
     padding: 0 10px;
     font-size: 12px;
-    &:hover:not(:disabled) { background: #fef0f0; }
+    &:hover:not(:disabled) {
+      background: #fef0f0;
+    }
   }
   &.ghost {
     background: transparent;
@@ -639,7 +665,10 @@ button {
     box-shadow: 0 0 0 2px rgba(230, 162, 60, 0.15);
   }
 
-  .entity-main { flex: 1; min-width: 0; }
+  .entity-main {
+    flex: 1;
+    min-width: 0;
+  }
   .entity-name {
     font-weight: 500;
     color: #303133;
@@ -658,7 +687,9 @@ button {
     font-size: 12px;
     color: #909399;
   }
-  .entity-meta { font-size: 12px; }
+  .entity-meta {
+    font-size: 12px;
+  }
 }
 
 .badge {
@@ -670,13 +701,31 @@ button {
   background: #f4f4f5;
   color: #606266;
 
-  &.plan-free { background: #f4f4f5; color: #606266; }
-  &.plan-pro { background: #ecf5ff; color: #409eff; }
-  &.plan-enterprise { background: #fdf6ec; color: #e6a23c; }
+  &.plan-free {
+    background: #f4f4f5;
+    color: #606266;
+  }
+  &.plan-pro {
+    background: #ecf5ff;
+    color: #409eff;
+  }
+  &.plan-enterprise {
+    background: #fdf6ec;
+    color: #e6a23c;
+  }
 
-  &.role-owner { background: #fef0f0; color: #f56c6c; }
-  &.role-admin { background: #fdf6ec; color: #e6a23c; }
-  &.role-member { background: #f0f9eb; color: #67c23a; }
+  &.role-owner {
+    background: #fef0f0;
+    color: #f56c6c;
+  }
+  &.role-admin {
+    background: #fdf6ec;
+    color: #e6a23c;
+  }
+  &.role-member {
+    background: #f0f9eb;
+    color: #67c23a;
+  }
 }
 
 .empty {
@@ -686,7 +735,9 @@ button {
   font-size: 13px;
 }
 
-.log-panel { margin-top: 16px; }
+.log-panel {
+  margin-top: 16px;
+}
 
 .log-list {
   list-style: none;
@@ -710,16 +761,28 @@ button {
     font-weight: 600;
     color: #606266;
   }
-  .url { color: #303133; word-break: break-all; }
-  .tenant { color: #909399; font-size: 11px; }
+  .url {
+    color: #303133;
+    word-break: break-all;
+  }
+  .tenant {
+    color: #909399;
+    font-size: 11px;
+  }
   .status {
     padding: 1px 8px;
     border-radius: 8px;
     font-size: 11px;
     font-weight: 600;
   }
-  &.ok .status { background: #f0f9eb; color: #67c23a; }
-  &.err .status { background: #fef0f0; color: #f56c6c; }
+  &.ok .status {
+    background: #f0f9eb;
+    color: #67c23a;
+  }
+  &.err .status {
+    background: #fef0f0;
+    color: #f56c6c;
+  }
 }
 
 .log-empty {
@@ -776,8 +839,12 @@ button {
     margin-top: 4px;
     color: #303133;
 
-    &.ok { color: #67c23a; }
-    &.err { color: #f56c6c; }
+    &.ok {
+      color: #67c23a;
+    }
+    &.err {
+      color: #f56c6c;
+    }
   }
 
   .metric-sub {
@@ -810,10 +877,21 @@ button {
     font-size: 11px;
   }
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 
-  .method { color: #606266; font-weight: 600; }
-  .path { color: #303133; word-break: break-all; }
-  .err { color: #f56c6c; font-weight: 600; }
+  .method {
+    color: #606266;
+    font-weight: 600;
+  }
+  .path {
+    color: #303133;
+    word-break: break-all;
+  }
+  .err {
+    color: #f56c6c;
+    font-weight: 600;
+  }
 }
 </style>

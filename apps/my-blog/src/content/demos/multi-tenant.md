@@ -23,4 +23,4 @@ pnpm start:dev
 # 如需自定义：PORT=4000 pnpm start:dev
 ```
 
-前端默认会按环境自动切换 API：本地 `http://localhost:3100`，线上 `http://tongxingkuan.xin:3100`。页面顶部输入框也支持运行时手动覆盖。
+前端默认会按环境自动切换 API：本地 `http://localhost:3100`，线上 `https://tongxingkuan.xin:3100`。页面顶部输入框也支持运行时手动覆盖。
