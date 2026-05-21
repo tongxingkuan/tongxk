@@ -28,6 +28,12 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  nitro: {
+    prerender: {
+      failOnError: false,
+      ignore: ['/api/_content'],
+    },
+  },
   devServer: {
     // 允许跨域
     cors: {
