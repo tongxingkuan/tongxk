@@ -45,5 +45,10 @@
   },
   "dependencies": {
     "vue-router": "^4.5.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "h3": "^1.15.11"
+    }
   }
 }
