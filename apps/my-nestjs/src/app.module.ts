@@ -4,14 +4,17 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { join } from 'node:path'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
+import { AuthModule } from './auth/auth.module'
 import { LoggerMiddleware } from './common/middleware/logger.middleware'
 import { MonitorModule } from './common/monitor/monitor.module'
 import { appConfig } from './config/app.config'
 import { databaseConfig, type DatabaseConfig } from './config/database.config'
+import { DbModule } from './db/db.module'
 import { MemberEntity } from './members/entities/member.entity'
 import { MembersModule } from './members/members.module'
 import { TenantEntity } from './tenants/entities/tenant.entity'
 import { TenantsModule } from './tenants/tenants.module'
+import { UserEntity } from './users/entities/user.entity'
 
 const NODE_ENV = process.env.NODE_ENV ?? 'development'
 
@@ -40,7 +43,7 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development'
             database: db.mongoDatabase,
             synchronize: db.synchronize,
             logging: db.logging,
-            entities: [TenantEntity, MemberEntity],
+            entities: [TenantEntity, MemberEntity, UserEntity],
           }
         }
         return {
@@ -48,13 +51,15 @@ const NODE_ENV = process.env.NODE_ENV ?? 'development'
           database: db.database,
           synchronize: db.synchronize,
           logging: db.logging,
-          entities: [TenantEntity, MemberEntity],
+          entities: [TenantEntity, MemberEntity, UserEntity],
         }
       },
     }),
+    AuthModule,
     TenantsModule,
     MembersModule,
     MonitorModule,
+    DbModule,
   ],
   controllers: [AppController],
   providers: [AppService],

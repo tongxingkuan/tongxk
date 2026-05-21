@@ -23,6 +23,42 @@
         {{ serverOk ? '服务已连接' : '服务未连接' }}
       </span>
       <span v-if="errorMsg" class="status-msg">{{ errorMsg }}</span>
+      <span class="status-spacer" />
+      <template v-if="currentUser">
+        <span class="user-tag" :class="{ admin: isSuperAdmin }">
+          {{ isSuperAdmin ? '⭐ 超级管理员' : '👤 普通用户' }} · {{ currentUser.username }}
+        </span>
+        <button class="ghost" @click="logout">退出登录</button>
+      </template>
+      <template v-else>
+        <button class="ghost" @click="openAuth('login')">登录</button>
+        <button class="ghost" @click="openAuth('register')">注册</button>
+      </template>
+    </div>
+
+    <!-- 登录/注册弹窗 -->
+    <div v-if="authVisible" class="auth-mask" @click.self="authVisible = false">
+      <div class="auth-card">
+        <header class="auth-header">
+          <button class="tab" :class="{ active: authMode === 'login' }" @click="authMode = 'login'">登录</button>
+          <button class="tab" :class="{ active: authMode === 'register' }" @click="authMode = 'register'">注册</button>
+          <button class="close" @click="authVisible = false">×</button>
+        </header>
+        <form class="auth-form" @submit.prevent="submitAuth">
+          <label>
+            <span>用户名</span>
+            <input v-model="authForm.username" autocomplete="username" required minlength="3" />
+          </label>
+          <label>
+            <span>密码</span>
+            <input v-model="authForm.password" type="password" autocomplete="current-password" required minlength="6" />
+          </label>
+          <div v-if="authError" class="auth-error">{{ authError }}</div>
+          <button type="submit" class="primary" :disabled="authLoading">
+            {{ authLoading ? '处理中…' : authMode === 'login' ? '登录' : '注册并登录' }}
+          </button>
+        </form>
+      </div>
     </div>
 
     <div class="panel-grid">
@@ -164,6 +200,53 @@
       <div v-else class="empty">暂无监控数据，请先启动 my-nestjs（端口 3100）</div>
     </section>
 
+    <!-- 数据库管理（仅超级管理员可见） -->
+    <section v-if="isSuperAdmin" class="log-panel db-panel">
+      <header class="panel-header">
+        <h3>🗄️ 数据库管理（superadmin）</h3>
+        <div class="header-tools">
+          <button class="ghost" @click="loadDbInfo">刷新</button>
+        </div>
+      </header>
+      <div class="db-body">
+        <div class="metric-cards">
+          <div class="metric-card">
+            <div class="metric-label">数据库类型</div>
+            <div class="metric-value">{{ dbInfo?.dbType ?? '—' }}</div>
+            <div class="metric-sub">{{ dbInfo?.database ?? '' }}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">租户数</div>
+            <div class="metric-value">{{ dbInfo?.counts?.tenants ?? 0 }}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">成员数</div>
+            <div class="metric-value">{{ dbInfo?.counts?.members ?? 0 }}</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">连接状态</div>
+            <div class="metric-value" :class="dbInfo?.isInitialized ? 'ok' : 'err'">
+              {{ dbInfo?.isInitialized ? 'connected' : '—' }}
+            </div>
+          </div>
+        </div>
+        <div class="db-actions">
+          <button class="primary" @click="seedDb">灌入示例数据</button>
+          <button class="danger-bg" @click="clearDb('tenants')">清空租户</button>
+          <button class="danger-bg" @click="clearDb('members')">清空成员</button>
+          <button class="danger-bg" @click="clearDb('all')">清空全部</button>
+          <button class="ghost-strong" @click="exportDb">导出 JSON</button>
+          <label class="ghost-strong file-btn">
+            导入 JSON
+            <input type="file" accept="application/json" @change="onImportFile" hidden />
+          </label>
+        </div>
+        <div v-if="dbActionMsg" class="db-msg" :class="dbActionOk ? 'ok' : 'err'">
+          {{ dbActionMsg }}
+        </div>
+      </div>
+    </section>
+
     <!-- 底部：API 调用日志 -->
     <section class="log-panel">
       <header class="panel-header">
@@ -245,6 +328,20 @@ interface MetricsInfo {
   routes: RouteMetric[]
 }
 
+interface DbInfo {
+  dbType: string
+  database: string
+  isInitialized: boolean
+  counts: { tenants: number; members: number }
+}
+
+interface CurrentUser {
+  id: string
+  username: string
+  role: string
+  createdAt: string
+}
+
 const DEFAULT_API_BASE = import.meta.env.DEV ? 'http://localhost:3100' : 'https://tongxingkuan.xin:3100'
 
 const apiBase = ref(DEFAULT_API_BASE)
@@ -258,6 +355,29 @@ const health = ref<HealthInfo | null>(null)
 const metrics = ref<MetricsInfo | null>(null)
 const autoPoll = ref(false)
 let pollTimer: ReturnType<typeof setInterval> | null = null
+
+const dbInfo = ref<DbInfo | null>(null)
+const dbActionMsg = ref('')
+const dbActionOk = ref(true)
+
+const TOKEN_KEY = 'mt-auth-token'
+const authToken = ref<string>('')
+const currentUser = ref<CurrentUser | null>(null)
+const isSuperAdmin = computed(() => currentUser.value?.role === 'superadmin')
+
+const authVisible = ref(false)
+const authMode = ref<'login' | 'register'>('login')
+const authForm = reactive({ username: '', password: '' })
+const authError = ref('')
+const authLoading = ref(false)
+
+const openAuth = (mode: 'login' | 'register') => {
+  authMode.value = mode
+  authForm.username = ''
+  authForm.password = ''
+  authError.value = ''
+  authVisible.value = true
+}
 
 const formatUptime = (sec?: number) => {
   if (!sec && sec !== 0) return '—'
@@ -299,12 +419,14 @@ const friendlyError = (status: number, path: string, method: string, serverMsg?:
 
 const request = async <T,>(
   path: string,
-  options: { method?: string; body?: unknown; tenant?: string } = {}
+  options: { method?: string; body?: unknown; tenant?: string; auth?: boolean } = {}
 ): Promise<T> => {
   const method = options.method ?? 'GET'
   const url = `${apiBase.value.replace(/\/$/, '')}${path}`
   const headers: Record<string, string> = { 'Content-Type': 'application/json' }
   if (options.tenant) headers['x-tenant-id'] = options.tenant
+  // 默认带上 token（如果有），便于服务端在需要时识别用户
+  if (authToken.value) headers['authorization'] = `Bearer ${authToken.value}`
   let status = '?'
   let ok = false
   try {
@@ -430,6 +552,76 @@ const resetMetrics = () =>
     await loadMonitor()
   })
 
+const setDbMsg = (msg: string, ok = true) => {
+  dbActionMsg.value = msg
+  dbActionOk.value = ok
+}
+
+const loadDbInfo = async () => {
+  try {
+    dbInfo.value = await request<DbInfo>('/db/info')
+  } catch (e) {
+    setDbMsg(e instanceof Error ? e.message : String(e), false)
+  }
+}
+
+const seedDb = () =>
+  safeRun(async () => {
+    const r = await request<{ createdTenants: number; createdMembers: number }>('/db/seed', {
+      method: 'POST',
+    })
+    setDbMsg(`已灌入 ${r.createdTenants} 个租户、${r.createdMembers} 个成员`, true)
+    await Promise.all([loadDbInfo(), loadAll()])
+  })
+
+const clearDb = (scope: 'all' | 'tenants' | 'members') =>
+  safeRun(async () => {
+    const label = scope === 'all' ? '全部数据' : scope === 'tenants' ? '租户' : '成员'
+    if (!confirm(`确定清空${label}？该操作不可恢复`)) return
+    const r = await request<{ deleted: Record<string, number> }>(`/db/data?scope=${scope}`, {
+      method: 'DELETE',
+    })
+    const summary = Object.entries(r.deleted)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join('，')
+    setDbMsg(`已清空 ${label}（${summary}）`, true)
+    await Promise.all([loadDbInfo(), loadAll()])
+  })
+
+const exportDb = () =>
+  safeRun(async () => {
+    const data = await request<unknown>('/db/export')
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = `my-nestjs-db-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-')}.json`
+    a.click()
+    URL.revokeObjectURL(a.href)
+    setDbMsg('已导出 JSON 文件', true)
+  })
+
+const onImportFile = (e: Event) => {
+  const input = e.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  if (!confirm(`导入将先清空当前数据，再写入 ${file.name}，是否继续？`)) {
+    input.value = ''
+    return
+  }
+  safeRun(async () => {
+    const text = await file.text()
+    const payload = JSON.parse(text)
+    const r = await request<{ imported: { tenants: number; members: number } }>('/db/import', {
+      method: 'POST',
+      body: payload,
+    })
+    setDbMsg(`已导入 ${r.imported.tenants} 个租户、${r.imported.members} 个成员`, true)
+    await Promise.all([loadDbInfo(), loadAll()])
+  }).finally(() => {
+    input.value = ''
+  })
+}
+
 watch(autoPoll, on => {
   if (pollTimer) {
     clearInterval(pollTimer)
@@ -445,8 +637,60 @@ watch(activeTenantId, () => {
   if (activeTenantId.value) safeRun(loadMembers)
 })
 
-onMounted(() => {
-  loadAll().then(() => loadMonitor())
+const persistToken = (token: string) => {
+  authToken.value = token
+  if (typeof window !== 'undefined') {
+    if (token) localStorage.setItem(TOKEN_KEY, token)
+    else localStorage.removeItem(TOKEN_KEY)
+  }
+}
+
+const submitAuth = async () => {
+  authError.value = ''
+  authLoading.value = true
+  try {
+    const path = authMode.value === 'login' ? '/auth/login' : '/auth/register'
+    const res = await request<{ token: string; user: CurrentUser }>(path, {
+      method: 'POST',
+      body: { username: authForm.username.trim(), password: authForm.password },
+    })
+    persistToken(res.token)
+    currentUser.value = res.user
+    authVisible.value = false
+    // 登录后刷新一次数据库信息（仅 superadmin 才有 db 面板可见）
+    if (isSuperAdmin.value) loadDbInfo()
+  } catch (e) {
+    authError.value = e instanceof Error ? e.message : String(e)
+  } finally {
+    authLoading.value = false
+  }
+}
+
+const logout = () => {
+  persistToken('')
+  currentUser.value = null
+  dbInfo.value = null
+}
+
+const restoreSession = async () => {
+  if (typeof window === 'undefined') return
+  const saved = localStorage.getItem(TOKEN_KEY)
+  if (!saved) return
+  authToken.value = saved
+  try {
+    currentUser.value = await request<CurrentUser>('/auth/me')
+  } catch {
+    // token 失效，清掉
+    persistToken('')
+    currentUser.value = null
+  }
+}
+
+onMounted(async () => {
+  await restoreSession()
+  await loadAll()
+  loadMonitor()
+  if (isSuperAdmin.value) loadDbInfo()
 })
 
 onBeforeUnmount(() => {
@@ -923,6 +1167,199 @@ button {
   .err {
     color: #f56c6c;
     font-weight: 600;
+  }
+}
+
+.db-panel {
+  margin-top: 0;
+  margin-bottom: 16px;
+
+  .token-input {
+    height: 28px;
+    border: 1px solid #dcdfe6;
+    border-radius: 6px;
+    padding: 0 10px;
+    font-size: 12px;
+    width: 220px;
+    outline: none;
+    &:focus {
+      border-color: #e6a23c;
+    }
+  }
+}
+
+.db-body {
+  padding: 14px 18px 14px;
+}
+
+.db-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+
+  .danger-bg {
+    background: #fef0f0;
+    color: #f56c6c;
+    border: 1px solid #fbc4c4;
+    height: 30px;
+    padding: 0 12px;
+    font-size: 12px;
+    &:hover:not(:disabled) {
+      background: #fde2e2;
+    }
+  }
+  .ghost-strong {
+    background: #fff;
+    color: #606266;
+    border: 1px solid #dcdfe6;
+    height: 30px;
+    padding: 0 12px;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    &:hover {
+      border-color: #e6a23c;
+      color: #e6a23c;
+    }
+  }
+  .file-btn {
+    line-height: 30px;
+  }
+}
+
+.db-msg {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  &.ok {
+    background: #f0f9eb;
+    color: #67c23a;
+  }
+  &.err {
+    background: #fef0f0;
+    color: #f56c6c;
+  }
+}
+
+.status-spacer {
+  flex: 1;
+}
+
+.user-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 10px;
+  font-weight: 500;
+  background: #f4f4f5;
+  color: #606266;
+  font-size: 12px;
+  &.admin {
+    background: #fdf6ec;
+    color: #e6a23c;
+  }
+}
+
+.auth-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.auth-card {
+  width: 360px;
+  max-width: 90vw;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.auth-header {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+  background: linear-gradient(135deg, rgba(230, 162, 60, 0.06), rgba(245, 108, 108, 0.06));
+
+  .tab {
+    flex: 1;
+    height: 44px;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: #909399;
+    font-weight: 500;
+    cursor: pointer;
+    &.active {
+      color: #e6a23c;
+      box-shadow: inset 0 -2px 0 #e6a23c;
+    }
+  }
+  .close {
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #909399;
+    cursor: pointer;
+  }
+}
+
+.auth-form {
+  padding: 18px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #606266;
+
+    input {
+      height: 36px;
+      border: 1px solid #dcdfe6;
+      border-radius: 6px;
+      padding: 0 10px;
+      font-size: 13px;
+      outline: none;
+      &:focus {
+        border-color: #e6a23c;
+      }
+    }
+  }
+
+  .auth-error {
+    color: #f56c6c;
+    font-size: 12px;
+    background: #fef0f0;
+    padding: 6px 10px;
+    border-radius: 6px;
+  }
+
+  .auth-tip {
+    font-size: 12px;
+    color: #909399;
+    text-align: center;
+    code {
+      background: #f4f4f5;
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+  }
+
+  button[type='submit'] {
+    height: 38px;
   }
 }
 </style>
