@@ -48,7 +48,10 @@
   },
   "pnpm": {
     "overrides": {
-      "h3": "^1.15.11"
+      "h3": "^1.15.11",
+      "@nuxt/content>@nuxt/kit": "3.21.6",
+      "@nuxtjs/mdc>@nuxt/kit": "3.21.6",
+      "@vueuse/nuxt>@nuxt/kit": "3.21.6"
     }
   }
 }
