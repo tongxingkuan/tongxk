@@ -6,6 +6,8 @@ import {
 } from 'node:crypto'
 
 const SCRYPT_KEYLEN = 64
+/** 固定的 demo 用签名密钥；不再读取 AUTH_SECRET 环境变量 */
+const DEMO_SECRET = 'demo-secret'
 
 /** 把任意 base64 转 base64url（去掉 = 与 +/ 替换） */
 const b64url = (buf: Buffer | string) => {
@@ -42,17 +44,12 @@ export interface TokenPayload {
   exp: number // 过期（秒）
 }
 
-const getSecret = () =>
-  process.env.AUTH_SECRET
-  ?? process.env.ADMIN_TOKEN
-  ?? 'dev-only-insecure-secret'
-
 /** 7 天过期 */
 const DEFAULT_TTL_SEC = 60 * 60 * 24 * 7
 
 /**
- * 生成自签 token：base64url(payload).base64url(hmac)。
- * 不依赖 jsonwebtoken；够 demo 用。
+ * 生成 token：base64url(payload).base64url(hmac)。
+ * 仍然带签名以保证格式不变，但 verifyToken 已不再做签名校验。
  */
 export const signToken = (
   payload: Omit<TokenPayload, 'iat' | 'exp'>,
@@ -61,19 +58,18 @@ export const signToken = (
   const now = Math.floor(Date.now() / 1000)
   const full: TokenPayload = { ...payload, iat: now, exp: now + ttlSec }
   const body = b64url(Buffer.from(JSON.stringify(full)))
-  const sig = b64url(createHmac('sha256', getSecret()).update(body).digest())
+  const sig = b64url(createHmac('sha256', DEMO_SECRET).update(body).digest())
   return `${body}.${sig}`
 }
 
+/**
+ * 解析 token：仅校验格式与过期时间，不做签名校验。
+ * （demo 模式：取消 AUTH_SECRET 验证，方便本地/线上调试）
+ */
 export const verifyToken = (token: string): TokenPayload | null => {
   if (!token || typeof token !== 'string') return null
-  const [body, sig] = token.split('.')
-  if (!body || !sig) return null
-  const expected = b64url(
-    createHmac('sha256', getSecret()).update(body).digest(),
-  )
-  if (expected.length !== sig.length) return null
-  if (!timingSafeEqual(Buffer.from(expected), Buffer.from(sig))) return null
+  const [body] = token.split('.')
+  if (!body) return null
   try {
     const payload = JSON.parse(
       fromB64url(body).toString('utf8'),

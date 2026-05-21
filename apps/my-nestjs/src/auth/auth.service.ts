@@ -23,7 +23,8 @@ export interface PublicUser {
 }
 
 const toPublic = (u: UserEntity): PublicUser => ({
-  id: u.id,
+  // mongo 历史数据可能是 ObjectId，统一转字符串
+  id: String(u.id),
   username: u.username,
   role: u.role,
   createdAt: u.createdAt,
@@ -104,7 +105,7 @@ export class AuthService implements OnModuleInit {
 
   private issue(user: UserEntity): { user: PublicUser, token: string } {
     const token = signToken({
-      sub: user.id,
+      sub: String(user.id),
       username: user.username,
       role: user.role,
     })
