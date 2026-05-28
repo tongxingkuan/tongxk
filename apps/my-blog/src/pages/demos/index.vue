@@ -184,6 +184,14 @@ const tagColorMap = new Map([
   ['交叉观察器', 'rgb(170, 1, 221)'],
   ['scroll', '#8e44ad'],
   ['前端', '#3498db'],
+  ['tiptap', '#7c3aed'],
+  ['prosemirror', '#0ea5e9'],
+  ['tippy', '#10b981'],
+  ['富文本编辑器', '#e6a23c'],
+  ['web worker', '#0891b2'],
+  ['流式输出', '#db2777'],
+  ['markdown', '#475569'],
+  ['rag', '#9333ea'],
 ])
 
 const getColor = (tagName: string) => {

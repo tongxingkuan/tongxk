@@ -1,7 +1,20 @@
 ---
 title: 'JS 基础面试题'
-description: 'Generator、Map vs Object、for...of 迭代、instanceof、数组去重'
-querys: ['Generator', 'Map', 'Object', 'for...of', 'instanceof', '数组去重', 'Symbol.iterator']
+description: 'Generator、Map vs Object、for...of 迭代、instanceof、数组去重、闭包与作用域'
+querys:
+  [
+    'Generator',
+    'Map',
+    'Object',
+    'for...of',
+    'instanceof',
+    '数组去重',
+    'Symbol.iterator',
+    '闭包',
+    '作用域',
+    'var',
+    'let',
+  ]
 ---
 
 ## JS 基础面试题
@@ -131,3 +144,53 @@ function unique(arr) {
   return [...new Set(arr)]
 }
 ```
+
+### 闭包与作用域：var + 形参遮蔽 + 共享外层变量
+
+```js
+const a = 2
+let count = 0
+const results = []
+function f(a) {
+  for (var i = 0; i < 3; i++) {
+    results[i] = function () {
+      count += i * a
+      console.log(count)
+    }
+  }
+}
+f(1)
+results[0]() // 3
+results[1]() // 6
+results[2]() // 9
+```
+
+这道题在经典"循环 + 闭包"题的基础上叠加了三个考点，逐一拆解：
+
+1. **形参遮蔽（作用域链查找）**
+   `f(1)` 调用时，函数形参 `a` 在 `f` 的局部作用域里被赋值为 `1`，遮蔽了外层 `const a = 2`。三个闭包向上查作用域链时，先在 `f` 的活动对象里找到 `a = 1`，不会再继续往全局找。
+
+2. **`var` 没有块级作用域，闭包共享同一个 `i`**
+   `var i` 被提升到 `f` 的函数作用域，三次循环写的都是同一个 `i`。循环结束后 `i = 3`，且这一个 `i` 同时被三个闭包共享（如果换成 `let i`，每轮迭代会生成独立的块级绑定，结果就不同）。
+
+3. **`count` 是外层 `let` 变量，被三个闭包共享并累加**
+   每次调用 `results[k]()` 都执行 `count += i * a`，即 `count += 3 * 1 = 3`：
+
+   - `results[0]()`：`count = 0 + 3 = 3`
+   - `results[1]()`：`count = 3 + 3 = 6`
+   - `results[2]()`：`count = 6 + 3 = 9`
+
+**对比版本**：把 `var i` 换成 `let i`，每个闭包各自捕获 `i = 0 / 1 / 2`，三次调用依次执行 `count += 0*1`、`count += 1*1`、`count += 2*1`：
+
+```js
+// 仅把 var 改成 let
+for (let i = 0; i < 3; i++) {
+  /* ... */
+}
+f(1)
+results[0]() // 0   count: 0 → 0
+results[1]() // 1   count: 0 → 1
+results[2]() // 3   count: 1 → 3
+```
+
+`var` 与 `let` 在这类题里的本质差异是 **闭包捕获的是同一个 `i` 还是各自独立的 `i`**。
