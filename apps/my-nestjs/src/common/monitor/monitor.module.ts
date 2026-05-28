@@ -1,8 +1,8 @@
-import { Global, Module } from '@nestjs/common';
-import { APP_INTERCEPTOR } from '@nestjs/core';
-import { MetricsInterceptor } from './metrics.interceptor';
-import { MetricsService } from './metrics.service';
-import { MonitorController } from './monitor.controller';
+import { Global, Module } from '@nestjs/common'
+import { APP_INTERCEPTOR } from '@nestjs/core'
+import { MetricsInterceptor } from './metrics.interceptor'
+import { MetricsService } from './metrics.service'
+import { MonitorController } from './monitor.controller'
 
 /**
  * 监控模块（全局）：提供内存型指标采集 + 健康检查端点。

@@ -1,6 +1,6 @@
-import { registerAs, type ConfigType } from '@nestjs/config';
+import { registerAs, type ConfigType } from '@nestjs/config'
 
-export type DbType = 'sqlite' | 'mongodb';
+export type DbType = 'sqlite' | 'mongodb'
 
 export const databaseConfig = registerAs('database', () => ({
   type: (process.env.DB_TYPE ?? 'sqlite') as DbType,
@@ -12,6 +12,6 @@ export const databaseConfig = registerAs('database', () => ({
   // 公共
   synchronize: process.env.DB_SYNCHRONIZE !== 'false',
   logging: process.env.DB_LOGGING === 'true',
-}));
+}))
 
-export type DatabaseConfig = ConfigType<typeof databaseConfig>;
+export type DatabaseConfig = ConfigType<typeof databaseConfig>

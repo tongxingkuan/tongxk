@@ -8,9 +8,9 @@ import {
   Param,
   Patch,
   Post,
-} from '@nestjs/common';
-import { CreateMemberDto, UpdateMemberDto } from './dto/member.dto';
-import { MembersService } from './members.service';
+} from '@nestjs/common'
+import { CreateMemberDto, UpdateMemberDto } from './dto/member.dto'
+import { MembersService } from './members.service'
 
 /**
  * 成员路由 —— 所有请求都需通过 `x-tenant-id` 请求头声明所属租户。
@@ -23,24 +23,27 @@ export class MembersController {
 
   private requireTenant(tenantId?: string): string {
     if (!tenantId) {
-      throw new BadRequestException('缺少 x-tenant-id 请求头，无法识别租户');
+      throw new BadRequestException('缺少 x-tenant-id 请求头，无法识别租户')
     }
-    return tenantId;
+    return tenantId
   }
 
   @Get()
   findAll(@Headers('x-tenant-id') tenantId?: string) {
-    return this.membersService.findAll(this.requireTenant(tenantId));
+    return this.membersService.findAll(this.requireTenant(tenantId))
   }
 
   @Get(':id')
   findOne(@Param('id') id: string, @Headers('x-tenant-id') tenantId?: string) {
-    return this.membersService.findOne(this.requireTenant(tenantId), id);
+    return this.membersService.findOne(this.requireTenant(tenantId), id)
   }
 
   @Post()
-  create(@Body() dto: CreateMemberDto, @Headers('x-tenant-id') tenantId?: string) {
-    return this.membersService.create(this.requireTenant(tenantId), dto);
+  create(
+    @Body() dto: CreateMemberDto,
+    @Headers('x-tenant-id') tenantId?: string,
+  ) {
+    return this.membersService.create(this.requireTenant(tenantId), dto)
   }
 
   @Patch(':id')
@@ -49,11 +52,11 @@ export class MembersController {
     @Body() dto: UpdateMemberDto,
     @Headers('x-tenant-id') tenantId?: string,
   ) {
-    return this.membersService.update(this.requireTenant(tenantId), id, dto);
+    return this.membersService.update(this.requireTenant(tenantId), id, dto)
   }
 
   @Delete(':id')
   remove(@Param('id') id: string, @Headers('x-tenant-id') tenantId?: string) {
-    return this.membersService.remove(this.requireTenant(tenantId), id);
+    return this.membersService.remove(this.requireTenant(tenantId), id)
   }
 }

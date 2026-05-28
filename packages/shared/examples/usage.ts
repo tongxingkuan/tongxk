@@ -1,6 +1,8 @@
 /**
  * Shared 模块使用示例
+ * 本文件用于演示各 API 用法，部分示例变量/类型只用于展示，不参与实际逻辑。
  */
+/* eslint-disable @typescript-eslint/no-unused-vars, no-unused-vars */
 
 // 导入工具函数
 import {
@@ -35,12 +37,10 @@ console.log('Is Mobile:', isMobile()) // true/false
 console.log('Is Desktop:', isDesktop()) // true/false
 
 // 防抖和节流
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const debouncedFn = debounce(() => {
   console.log('Debounced function called')
 }, 300)
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const throttledFn = throttle(() => {
   console.log('Throttled function called')
 }, 300)
@@ -53,7 +53,6 @@ console.log('Query string:', buildQueryString({ page: '1', size: '10' })) // "?p
 // ===== 组件工具使用示例 =====
 
 // 组件创建（简化示例）
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const MyComponent = createComponent(
   {
     props: {
@@ -66,7 +65,7 @@ const MyComponent = createComponent(
     // 这里应该是 Vue 组件的渲染逻辑
     console.log('Component props:', props)
     return () => console.log('Component rendered')
-  }
+  },
 )
 
 // 路由创建
@@ -81,7 +80,6 @@ console.log('Redirect route:', redirectRoute)
 // ===== 类型定义使用示例 =====
 
 // 组件参数类型
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface MyComponentParams extends ComponentParams {
   props: {
     title: string
@@ -91,7 +89,7 @@ interface MyComponentParams extends ComponentParams {
 }
 
 // 工具类型
-type MyType = Prettify<{ a: string; b: number }>
+type MyType = Prettify<{ a: string, b: number }>
 type OptionalFn = MaybeFn<string>
 
 // 使用示例

@@ -16,7 +16,7 @@ export const MdViewer = createComponent<ViewerOptions>(
     const viewerRef = ref<HTMLDivElement>()
 
     return () => <div ref={viewerRef} innerHTML={props.content} />
-  }
+  },
 )
 
 export default MdViewer

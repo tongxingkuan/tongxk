@@ -1,6 +1,6 @@
-import { registerAs, type ConfigType } from '@nestjs/config';
+import { registerAs, type ConfigType } from '@nestjs/config'
 
-export type Environment = 'development' | 'test' | 'production';
+export type Environment = 'development' | 'test' | 'production'
 
 export const appConfig = registerAs('app', () => ({
   // 端口避开前端段（3000=my-blog, 3001/3002/3003=qiankun 子应用）
@@ -11,6 +11,6 @@ export const appConfig = registerAs('app', () => ({
   isDev: process.env.NODE_ENV === 'development',
   isTest: process.env.NODE_ENV === 'test',
   isProd: process.env.NODE_ENV === 'production',
-}));
+}))
 
-export type AppConfig = ConfigType<typeof appConfig>;
+export type AppConfig = ConfigType<typeof appConfig>

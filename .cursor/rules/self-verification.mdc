@@ -39,6 +39,29 @@ alwaysApply: true
 
 ### 1. 静态验证（必做）
 
+#### 1.1 ESLint 检测与自动修复（任何 ts/tsx/js 改动都要做）
+
+仓库根 `package.json` 配了 `lint-staged`：提交时会对已 staged 的 `**/*.{js,ts,tsx}` 跑 `eslint --fix`。提交前自己先跑一遍，避免 husky 钩子拦截：
+
+```bash
+# 推荐：只针对本次改动文件，省时间
+npx eslint <修改的文件路径，空格分隔> --fix
+
+# 兜底：全量（会输出仓库历史遗留错误，注意区分本次新增还是 pre-existing）
+pnpm lint --fix
+```
+
+要点：
+- **必须用 `--fix`**：仓库 `@stylistic/*` 规则（semi、comma-dangle、member-delimiter-style、operator-linebreak 等）大多数可自动修复。
+- 自动修复后，剩余报错通常是**需要人工改**的：
+  - `@typescript-eslint/no-explicit-any` → 补具体类型或定义 interface，禁止用 `// eslint-disable` 绕过
+  - `@stylistic/max-statements-per-line` → 多语句拆行，不要塞在一行用 `;` 串
+  - `Parsing error` → 语法错误，必须修
+- 仅判定"本次涉及文件"是否干净，不必为 pre-existing 历史错误负责，但要在汇报里标注。
+- `.vue` 文件目前 eslint 配置未覆盖（`File ignored because no matching configuration was supplied`），属正常，不算报错。
+
+#### 1.2 构建验证
+
 按改动落在哪个 app 选命令，**只跑相关 app**，不要全量 `build:all` 浪费时间：
 
 | 改动范围 | 命令（在仓库根目录执行） |
@@ -47,11 +70,10 @@ alwaysApply: true
 | 仅 `apps/my-blog` | `pnpm --filter my-blog build` |
 | 子应用（react/vite/vue2） | `pnpm --filter <app-name> build` |
 | 跨 app 或共享包 | `pnpm build:all` |
-| 任意 ts/js 改动 | `pnpm lint`（会自动 fix 可修项） |
 
 NestJS 的 `nest build` 自带 `tsc` 类型检查；Nuxt 的 `nuxt build` 同理。无需另外跑 `tsc`。
 
-**失败必须修复后再总结，不得报"已完成"。**
+**lint / build 失败必须修复后再总结，不得报"已完成"。**
 
 ### 2. 逻辑验证（强烈推荐）
 
@@ -89,6 +111,7 @@ NestJS 的 `nest build` 自带 `tsc` 类型检查；Nuxt 的 `nuxt build` 同理
 - path/to/file.ts — [改了什么]
 
 验证：
+- Lint：`npx eslint <files> --fix` ✅（或：N 处自动修复，剩余 M 处人工修复完毕）
 - 静态：pnpm --filter my-nestjs build ✅
 - 逻辑：覆盖了空 id / tenant 不存在两个边界
 - 运行：pnpm --filter my-nestjs test ✅（或：未跑，原因 …）
@@ -104,10 +127,12 @@ NestJS 的 `nest build` 自带 `tsc` 类型检查；Nuxt 的 `nuxt build` 同理
 > "改完了，应该没问题。"
 
 没跑构建、没跑 lint、没考虑两个 DB 驱动的差异，等用户上线后报"租户 id 不存在"——这就是上次发生过的事。
+也包括："没跑 eslint 就提交，被 husky / lint-staged 钩子拦下来回头再修一遍"，参考最近一次 `@typescript-eslint/no-explicit-any` 和 `@stylistic/max-statements-per-line` 报错。
 
 ## 正例
 
 > "已完成租户删除问题修复。
+> - Lint：`npx eslint apps/my-nestjs/src/tenants/*.ts --fix` ✅（自动修复 5 处 stylistic，无人工项）
 > - 静态：`pnpm --filter my-nestjs build` 通过；
 > - 逻辑：mongo 走 `@ObjectIdColumn` 自动生成 \_id，sqlite 走 uuid 主键，两侧 create 路径都核对过；
 > - 运行：未跑 e2e（需真实 mongo），建议你在测试环境验证 create→list→delete 链路；

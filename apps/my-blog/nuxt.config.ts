@@ -65,5 +65,12 @@ export default defineNuxtConfig({
     },
   },
 
+  runtimeConfig: {
+    // 仅服务端可读；可通过环境变量 NUXT_OLLAMA_BASE_URL / NUXT_OLLAMA_MODEL / NUXT_OLLAMA_API_KEY 覆盖
+    ollamaBaseUrl: 'https://tongxingkuan.xin:2083',
+    ollamaModel: 'glm-5.1:cloud',
+    ollamaApiKey: 'c80054aa68e34294b54bdc47418d970c.Txirw2k2G8r_IOFf9xbAYWWH',
+  },
+
   compatibilityDate: '2025-02-08',
 })
