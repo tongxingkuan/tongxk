@@ -13,6 +13,7 @@
     "build:all": "pnpm -r build",
     "dev:all-apps": "pnpm -r --parallel --workspace-concurrency=4 dev",
     "dev:sub-apps": "pnpm --parallel --filter my-vite-app --filter my-react-app --filter my-vue2-app dev",
+    "dev:platform": "pnpm --parallel --filter my-nestjs --filter my-vite-app --filter my-react-app dev",
     "dev:main-app": "pnpm --filter my-blog dev"
   },
   "keywords": [

@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { randomUUID } from 'node:crypto'
 import { Repository } from 'typeorm'
 import { UserEntity } from '../users/entities/user.entity'
+import { RolesService } from '../roles/roles.service'
 import {
   hashPassword,
   signToken,
@@ -20,6 +21,7 @@ export interface PublicUser {
   username: string
   role: string
   createdAt: Date
+  permissions?: string[]
 }
 
 const toPublic = (u: UserEntity): PublicUser => ({
@@ -35,6 +37,7 @@ export class AuthService implements OnModuleInit {
   constructor(
     @InjectRepository(UserEntity)
     private readonly users: Repository<UserEntity>,
+    private readonly rolesService: RolesService,
   ) {}
 
   /** 应用启动时确保超级管理员存在 */
@@ -49,6 +52,8 @@ export class AuthService implements OnModuleInit {
         username,
         passwordHash: hashPassword(password),
         role: 'superadmin',
+        status: 'active',
+        displayName: '超级管理员',
         createdAt: new Date(),
       }),
     )
@@ -74,6 +79,8 @@ export class AuthService implements OnModuleInit {
         username,
         passwordHash: hashPassword(password),
         role: 'user',
+        status: 'active',
+        displayName: null,
         createdAt: new Date(),
       }),
     )
@@ -103,12 +110,20 @@ export class AuthService implements OnModuleInit {
     return this.findById(payload.sub)
   }
 
-  private issue(user: UserEntity): { user: PublicUser, token: string } {
+  async enrichUser(user: PublicUser): Promise<PublicUser> {
+    const permissions = await this.rolesService.getPermissionsByCode(user.role)
+    return { ...user, permissions }
+  }
+
+  private async issue(
+    user: UserEntity,
+  ): Promise<{ user: PublicUser, token: string }> {
     const token = signToken({
       sub: String(user.id),
       username: user.username,
       role: user.role,
     })
-    return { user: toPublic(user), token }
+    const publicUser = await this.enrichUser(toPublic(user))
+    return { user: publicUser, token }
   }
 }

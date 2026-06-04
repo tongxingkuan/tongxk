@@ -25,12 +25,16 @@ export class DbService {
   ) {}
 
   async info() {
-    const opts = this.dataSource.options as { type: string, database?: string }
+    const opts = this.dataSource.options as {
+      type: string
+      database?: string
+      location?: string
+    }
     const dbType = opts.type
     const database
       = dbType === 'mongodb'
         ? (opts.database ?? '(default)')
-        : (opts.database ?? '(unknown)')
+        : (opts.location ?? opts.database ?? '(unknown)')
 
     const [tenantCount, memberCount] = await Promise.all([
       this.tenantsRepo.count(),

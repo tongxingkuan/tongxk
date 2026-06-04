@@ -22,9 +22,15 @@ export class UserMongoEntity {
   @Column()
   passwordHash!: string
 
-  /** 'superadmin' | 'user' */
+  /** 角色编码，对应 roles.code */
   @Column()
   role!: string
+
+  @Column()
+  status!: string
+
+  @Column()
+  displayName!: string | null
 
   @Column()
   createdAt!: Date

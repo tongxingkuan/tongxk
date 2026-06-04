@@ -66,6 +66,10 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    public: {
+      // 生产环境绝对链接前缀，可通过 NUXT_PUBLIC_SITE_URL 覆盖
+      siteUrl: 'https://tongxingkuan.xin',
+    },
     // 仅服务端可读；可通过环境变量 NUXT_OLLAMA_BASE_URL / NUXT_OLLAMA_MODEL / NUXT_OLLAMA_API_KEY 覆盖
     ollamaBaseUrl: 'https://tongxingkuan.xin:2083',
     ollamaModel: 'glm-5.1:cloud',

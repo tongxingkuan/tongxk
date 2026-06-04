@@ -1,41 +1,45 @@
-const path = require("path");
-const HtmlWebpackPlugin = require("html-webpack-plugin");
-const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
-const { name } = require("./package");
+const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const webpack = require('webpack')
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const { name } = require('./package')
 
 module.exports = {
-  entry: "./src/index.tsx",
+  entry: './src/index.tsx',
   output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "[name].[contenthash].js",
-    publicPath: "/",
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js',
+    publicPath: '/',
     library: `${name}-[name]`,
-    libraryTarget: "umd",
+    libraryTarget: 'umd',
     // webpack 5 需要把 jsonpFunction 替换成 chunkLoadingGlobal
     chunkLoadingGlobal: `webpackJsonp_${name}`,
   },
   resolve: {
     alias: {
-      src: path.resolve(__dirname, "src"),
+      src: path.resolve(__dirname, 'src'),
     },
-    extensions: [".ts", ".tsx", ".js", ".jsx", ".css"], // 确保处理 TS 和 TSX 文件
+    extensions: ['.ts', '.tsx', '.js', '.jsx', '.css'], // 确保处理 TS 和 TSX 文件
   },
   module: {
     rules: [
       {
         test: /\.(ts|tsx)$/,
         exclude: /node_modules/,
-        use: ["babel-loader", "ts-loader"],
+        use: ['babel-loader', 'ts-loader'],
       },
       {
         test: /\.css$/,
-        use: ["style-loader", "css-loader"],
+        use: ['style-loader', 'css-loader'],
       },
     ],
   },
   plugins: [
+    new webpack.DefinePlugin({
+      'process.env.API_BASE_URL': JSON.stringify(process.env.API_BASE_URL || 'http://localhost:3100'),
+    }),
     new HtmlWebpackPlugin({
-      template: "./public/index.html",
+      template: './public/index.html',
       minify: {
         removeComments: true,
         collapseWhitespace: true,
@@ -55,18 +59,18 @@ module.exports = {
   ],
   optimization: {
     splitChunks: {
-      chunks: "all",
+      chunks: 'all',
     },
   },
   devServer: {
     static: {
-      directory: path.join(__dirname, "dist"),
+      directory: path.join(__dirname, 'dist'),
     },
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      'Access-Control-Allow-Origin': '*',
     },
     port: 3002,
     hot: true,
     historyApiFallback: true,
   },
-};
+}

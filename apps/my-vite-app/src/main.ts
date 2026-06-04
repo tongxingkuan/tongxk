@@ -1,10 +1,13 @@
 import { createApp, type App as VueApp } from 'vue'
+import naive from 'naive-ui'
 import 'src/styles/global.css'
 import { App } from 'src/app'
 import router from 'src/router'
+import { useAuth } from 'src/composables/use-auth'
+import { syncSubAppUrlToHash } from 'src/lib/qiankun-base'
 import { renderWithQiankun, qiankunWindow } from 'vite-plugin-qiankun/dist/helper'
 
-let app: VueApp | undefined = undefined
+let app: VueApp | undefined
 
 declare global {
   interface Window {
@@ -21,18 +24,26 @@ declare global {
   }
 }
 
-const render = (props: unknown) => {
+const render = async (props: unknown) => {
   console.log('子应用（viteApp）', props)
   const { container } = props as { container: HTMLElement }
 
-  app = createApp(App)
-  app.use(router)
+  const pendingPath = qiankunWindow.__POWERED_BY_QIANKUN__ ? syncSubAppUrlToHash() : null
 
-  // 在 qiankun 环境中，直接挂载到容器
+  const { restore } = useAuth()
+  await restore()
+
+  app = createApp(App)
+  app.use(naive)
+  app.use(router)
+  if (pendingPath) {
+    await router.replace(pendingPath)
+  }
+  await router.isReady()
+
   if (qiankunWindow.__POWERED_BY_QIANKUN__ && container) {
     app.mount(container)
   } else {
-    // 独立运行时挂载到 #app
     app.mount('#app')
   }
 
@@ -45,14 +56,15 @@ const initQianKun = () => {
   renderWithQiankun({
     bootstrap() {},
     mount(props) {
-      render(props)
+      void render(props)
     },
     unmount() {
       app?.unmount()
+      app = undefined
     },
     update() {},
   })
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
-qiankunWindow.__POWERED_BY_QIANKUN__ ? initQianKun() : render({})
+qiankunWindow.__POWERED_BY_QIANKUN__ ? initQianKun() : void render({})

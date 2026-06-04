@@ -1,29 +1,46 @@
 import 'src/App.css'
-import { HashRouter, Link, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import Home from 'src/pages/Home'
 import List from 'src/pages/List'
-import 'src/lib/visitor'
-import { Provider } from 'react-redux'
-import userStore from './store/user'
+import Login from 'src/pages/Login'
+import Register from 'src/pages/Register'
+import SiteHeader from 'src/components/SiteHeader'
+import { SiteConfigProvider } from 'src/context/SiteConfigContext'
+import { Provider, useDispatch } from 'react-redux'
+import store, { type AppDispatch } from './store'
+import { restoreSession } from './store/auth'
+import { useEffect } from 'react'
 
-const App = () => {
+function AppShell() {
+  const dispatch = useDispatch<AppDispatch>()
+
+  useEffect(() => {
+    void dispatch(restoreSession())
+  }, [dispatch])
+
   return (
-    <>
-      <h1 className="title">Hello React!</h1>
-      <Provider store={userStore}>
-        <HashRouter>
-          <div className="flex flex-col items-center justify-center">
-            <Link to="/">首页</Link>
-            <Link to="/list">列表</Link>
-          </div>
-          <Routes>
-            <Route path="/" Component={Home} />
-            <Route path="/list" Component={List} />
-          </Routes>
-        </HashRouter>
-      </Provider>
-    </>
+    <SiteConfigProvider>
+      <HashRouter>
+        <div className="site-shell">
+          <SiteHeader />
+          <main className="site-main">
+            <Routes>
+              <Route path="/" Component={Home} />
+              <Route path="/list" Component={List} />
+              <Route path="/login" Component={Login} />
+              <Route path="/register" Component={Register} />
+            </Routes>
+          </main>
+        </div>
+      </HashRouter>
+    </SiteConfigProvider>
   )
 }
+
+const App = () => (
+  <Provider store={store}>
+    <AppShell />
+  </Provider>
+)
 
 export default App

@@ -8,9 +8,9 @@ querys: ['qiankun', '微前端', 'monorepo']
 
 ### 乾坤子项目
 
-[vue2](http://localhost:3000/qiankun/vue2App)  
-[vue3](http://localhost:3000/qiankun/viteApp)  
-[react](http://localhost:3000/qiankun/reactApp)
+:c-link{name=vue2 path=/qiankun/vue2App prodPort=3003 envHref=true target=self}  
+:c-link{name=vue3 path=/qiankun/viteApp prodPort=3001 envHref=true target=self}  
+:c-link{name=react path=/qiankun/reactApp prodPort=3002 envHref=true target=self}
 
 ## 项目概述
 

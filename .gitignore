@@ -12,3 +12,4 @@ apps/**/*.tar.gz
 apps/my-nestjs/data/
 *.sqlite
 *.sqlite-journal
+.env

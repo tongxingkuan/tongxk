@@ -1,3 +1,4 @@
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './public-path'
@@ -11,14 +12,8 @@ declare global {
       event: {
         on: (eventName: string, callback: (...args: unknown[]) => void) => void
         emit: (eventName: string, ...args: unknown[]) => void
-        once: (
-          eventName: string,
-          callback: (...args: unknown[]) => void,
-        ) => void
-        off: (
-          eventName: string,
-          callback: (...args: unknown[]) => void,
-        ) => void
+        once: (eventName: string, callback: (...args: unknown[]) => void) => void
+        off: (eventName: string, callback: (...args: unknown[]) => void) => void
         watch: (callback: (...args: unknown[]) => void) => void
       }
     }
@@ -28,7 +23,7 @@ declare global {
 const render = (props?: { msg: string }) => {
   console.log('render', props)
   root = ReactDOM.createRoot(document.getElementById('root') as Element)
-  root.render(App() as React.ReactElement)
+  root.render(<App />)
 }
 
 if (!window.__POWERED_BY_QIANKUN__) {

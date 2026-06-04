@@ -16,9 +16,15 @@ export class UserSqliteEntity {
   @Column({ name: 'password_hash' })
   passwordHash!: string
 
-  /** 'superadmin' | 'user' */
+  /** 角色编码，对应 roles.code */
   @Column({ default: 'user' })
   role!: string
+
+  @Column({ default: 'active' })
+  status!: string
+
+  @Column({ name: 'display_name', nullable: true, type: 'text' })
+  displayName!: string | null
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date
