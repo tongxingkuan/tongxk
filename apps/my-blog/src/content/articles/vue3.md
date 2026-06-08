@@ -78,9 +78,65 @@ class RefImpl {
 
 ##### 3. effect —— 依赖收集与派发
 
-vue3.4 之前使用 `targetMap: WeakMap<target, Map<key, Set<effect>>>`；3.4 之后改为 **Dep + version 双向链表**（`packages/reactivity/src/dep.ts`、`effect.ts`），目的是减少内存占用、加速「本次 run 未再次访问的依赖」清理。
+vue3.4 之前使用 `targetMap: WeakMap<target, Map<key, Set<effect>>>`；3.4 之后改为 **Dep + version 双向链表**（`packages/reactivity/src/dep.ts`、`effect.ts`），目的是减少内存占用、加速「本次 run 未再次访问的依赖」清理。下面先拆开旧版三层表与 **WeakMap** 的含义，再对照 3.4+ 的实现。
 
-核心流程：
+##### 3.1 旧版依赖表：WeakMap → Map → Set
+
+```ts
+// packages/reactivity/src/effect.ts（3.4 前，简化）
+type KeyToDepMap = Map<any, Dep>
+const targetMap = new WeakMap<object, KeyToDepMap>()
+```
+
+| 层级    | 结构                   | 含义                                                                                                              |
+| ------- | ---------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| 第 1 层 | `WeakMap<object, Map>` | **键**：被代理的原始对象 `target`；**值**：该对象上「每个属性 → 订阅者集合」的 Map                                |
+| 第 2 层 | `Map<key, Set>`        | **键**：访问过的属性名（`string` / `Symbol`，数组还有 `'length'`）；**值**：订阅该 `(target, key)` 的 effect 集合 |
+| 第 3 层 | `Set<ReactiveEffect>`  | 同一 dep 上的 effect 去重存放                                                                                     |
+
+**track**（读）：`targetMap.get(target)?.get(key)?.add(activeEffect)`  
+**trigger**（写）：取出同一 `(target, key)` 的 Set，逐个调度 effect。
+
+###### WeakMap 是什么？
+
+`WeakMap` 与 `Map` 一样是键值映射，但有三点差异：
+
+1. **键必须是对象**（原始值不能作为 WeakMap 的键）
+2. **弱引用**：键对象在外部已无任何强引用时，GC 会回收该对象，**WeakMap 里对应条目自动消失**，不必手动 `delete`
+3. **不可枚举**：没有 `size`、`keys()`、`forEach`，无法遍历全部条目
+
+```ts
+let obj = { count: 0 }
+const wm = new WeakMap<object, number>()
+wm.set(obj, 1)
+obj = null // 除 WeakMap 外无强引用 → GC 后条目自动释放
+```
+
+常见 API：`get` / `set` / `has` / `delete`；没有 `clear()`。
+
+###### Vue 为什么用 WeakMap 做 targetMap 第一层？
+
+响应式 `target` 与组件、computed、watch 的**生命周期往往不一致**：组件卸载后，业务侧可能不再持有某个 reactive 对象，但依赖表里若用普通 `Map` **强引用** `target`，对象无法被 GC，造成泄漏。
+
+以 `target` 为 WeakMap 的键时：
+
+- 仍有人使用 proxy / reactive → 条目保留，track / trigger 正常
+- 全局不再引用该对象 → GC 回收 target → WeakMap 条目随之消失，**不必在 effect.stop() 里逐层删 Map**
+
+内层仍用 `Map` + `Set`：属性 key 可能是 string / symbol，且 trigger 时要按 key **精确查找**订阅者；Set 保证同一 effect 对同一 dep 只收集一次。
+
+###### 与 3.4 Dep 双向链表的对比
+
+| 维度                       | WeakMap 三层表（3.4 前）            | Dep + version 双向链表（3.4+）              |
+| -------------------------- | ----------------------------------- | ------------------------------------------- |
+| 依赖存储                   | `(target, key) → Set<effect>`       | effect 与 Dep 通过 **Link** 节点互连        |
+| 清理「本次未再访问」的 dep | effect 重跑后 diff 旧 Set，删多余项 | `prepareDeps` 标记版本 + `cleanupDeps` 卸链 |
+| target 无人引用            | WeakMap 弱引用，随 GC 释放          | 仍依赖 Link 解绑与 effect 生命周期          |
+| 调试直觉                   | 全局一张表，按 target/key 查 effect | 链表分散在各 Dep 上，更贴订阅模型           |
+
+理解 WeakMap 版 targetMap，有助于读 3.3 及以前的 PR/issue，以及明白文档里常说的「target → key → effect」三层结构从何而来。
+
+核心流程（3.4+）：
 
 1. `effect.run()` 执行前把自身压入 `activeSub`
 2. `track(target, key)` 时读取 `activeSub`，建立 `Sub ↔ Dep` 双向链接节点

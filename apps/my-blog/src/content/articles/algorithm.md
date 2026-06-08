@@ -168,4 +168,45 @@ function formatNumber(num) {
   }
   return `${result.join('')}.${decimal}`
 }
+
+// 改造版本
+function formatNumber(num) {
+  // 1. 严格校验：如果不是有效数字，直接返回 '-'
+  if (typeof num !== 'number' || isNaN(num)) {
+    return '-'
+  }
+
+  // 2. 核心改造：利用 Math.round 进行真正的四舍五入（放大100倍再缩小100倍）
+  //    这样可以确保无论原始数字有几位小数，都会被规整为最多 2 位小数
+  let roundedNum = Math.round(num * 100) / 100
+  // 3. 转为字符串，开始切分整数和小数
+  let str = roundedNum.toString()
+
+  // 这一步可以直接替代2和3步骤
+  // let str = num.toFixed(2)
+
+  let [integer, decimal = ''] = str.split('.')
+
+  // 4. 补齐小数位：因为上面处理后，decimal 最长也就是2位，所以 padEnd 补零后直接用就行
+  decimal = decimal.padEnd(2, '0')
+
+  // 5. 千分位核心逻辑（保持原汁原味）
+  let result = [],
+    count = 0
+  for (let i = integer.length - 1; i >= 0; i--) {
+    // 照顾负数的情况：如果是负号，不参与千分位计数，直接放进去并结束循环
+    if (integer[i] === '-') {
+      result.unshift('-')
+      break
+    }
+
+    count++
+    result.unshift(integer[i])
+    if (count % 3 === 0 && i !== 0) {
+      result.unshift(',')
+    }
+  }
+
+  return `${result.join('')}.${decimal}`
+}
 ```

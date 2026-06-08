@@ -1,7 +1,7 @@
 ---
 title: '基于 pnpm workspace 和 qiankun 的微前端架构技术宣讲'
-description: '微前端、乾坤、monorepo'
-querys: ['qiankun', '微前端', 'monorepo']
+description: '微前端、乾坤、monorepo、qiankun 与 wujie 对比'
+querys: ['qiankun', 'wujie', '无界', '微前端', 'monorepo']
 ---
 
 ## 项目展示
@@ -1353,6 +1353,167 @@ const appStateTransitions = {
 - **qiankun 环境**: 由主应用注入的路径
 
 动态 publicPath 确保在所有环境下都能正确加载静态资源。
+
+### 3.6 qiankun 与 wujie 对比
+
+`qiankun` 和 `wujie`（无界）都是国内团队维护、生产环境验证过的**应用级微前端**方案。两者目标一致——让多个独立子应用在主应用里组合运行——但**隔离思路、接入成本、对 Vite/ESM 的友好度**差异很大。
+
+#### 3.6.1 一句话定位
+
+| 框架        | 出品                    | 核心思路                                       | 一句话                                  |
+| ----------- | ----------------------- | ---------------------------------------------- | --------------------------------------- |
+| **qiankun** | 蚂蚁（基于 single-spa） | 同窗口 + Proxy 沙箱 + HTML Entry               | 成熟生态，Webpack 子应用接入最顺        |
+| **wujie**   | 腾讯                    | iframe 运行 JS + Web Component 容器 + 代理同步 | 隔离更彻底，Vite/ESM、keep-alive 更友好 |
+
+#### 3.6.2 架构原理
+
+**qiankun：同窗口沙箱**
+
+```
+主应用 window
+├── registerMicroApps / start
+├── fetch 子应用 index.html（HTML Entry）
+├── 解析 script / style，在沙箱中 eval 执行
+├── Proxy 伪造 fakeWindow，拦截全局变量读写
+└── 子应用 DOM 挂到主应用 #container
+```
+
+1. **HTML Entry**：请求子应用 `index.html`，用 `import-html-entry` 解析出 JS/CSS 再注入执行。
+2. **JS 沙箱**：`ProxySandbox` 为每个子应用维护独立 `fakeWindow`；读不到时穿透真实 `window`，写入只落在沙箱内。
+3. **样式隔离**：Shadow DOM（`strictStyleIsolation`）或选择器前缀（`experimentalStyleIsolation`）。
+4. **生命周期**：子应用导出 `bootstrap / mount / unmount`，由 single-spa 调度。
+
+**wujie：iframe + 代理降维**
+
+```
+主应用
+├── <wujie-app> Web Component 容器
+│   └── Shadow DOM / 挂载点
+└── 隐藏 iframe（子应用真实 JS 运行环境）
+    ├── 独立 window / document / history
+    ├── 代理：把 iframe 内 DOM 操作同步到主应用容器
+    └── 路由、location 通过 proxy 与主应用对齐
+```
+
+1. **JS 隔离**：子应用代码在 **iframe 的独立 window** 里跑，天然隔离全局变量、定时器、`document` 污染。
+2. **渲染同步**：通过代理把 iframe 内的 DOM 变更「投影」到主应用 Web Component 容器，用户感知仍是单页。
+3. **Web Component**：`<wujie-app>` 作为标准容器，样式边界清晰。
+4. **keep-alive**：切换路由时 iframe 可 **隐藏而非销毁**，子应用状态（表单、滚动位置）得以保留。
+
+#### 3.6.3 核心维度对比
+
+| 维度               | qiankun                                         | wujie                                                      |
+| ------------------ | ----------------------------------------------- | ---------------------------------------------------------- |
+| **JS 隔离**        | Proxy 沙箱（同 window）                         | iframe 独立 window（隔离更彻底）                           |
+| **CSS 隔离**       | 需配置 Shadow DOM / 前缀                        | iframe 天然隔离，冲突少                                    |
+| **子应用接入**     | 需导出生命周期、改 publicPath、UMD 或插件       | 改动少，子应用接近「零改造」                               |
+| **Vite / ESM**     | dev 下原生 ESM 难劫持，需 `vite-plugin-qiankun` | iframe 内原生 ESM 可直接跑                                 |
+| **keep-alive**     | 默认切换即 unmount，需 `loadMicroApp` 或自研    | 内置保活，切走隐藏 iframe                                  |
+| **性能 / 内存**    | 单 window，开销相对小                           | 每子应用一个 iframe，内存占用更高                          |
+| **弹窗 / 挂 body** | Shadow DOM 下 Modal 易踩坑                      | iframe 内弹窗仍在 iframe document，需配置 `degrade` 或降级 |
+| **预加载**         | `prefetch` 策略                                 | 支持 preload / 预执行                                      |
+| **生态成熟度**     | 文档、案例、社区最丰富                          | 较新，腾讯内部场景验证多                                   |
+| **依赖共享**       | 需 externals / Module Federation 自行处理       | 各 iframe 独立依赖，重复打包风险高                         |
+
+#### 3.6.4 子应用接入对比
+
+**qiankun 典型改造**（本节 3.2 已有完整实践，此处摘录要点）：
+
+```js
+if (window.__POWERED_BY_QIANKUN__) {
+  __webpack_public_path__ = window.__INJECTED_PUBLIC_PATH_BY_QIANKUN__
+}
+
+export async function bootstrap() {}
+export async function mount(props) {
+  render(props)
+}
+export async function unmount() {
+  root?.unmount()
+}
+```
+
+Webpack 还需 `libraryTarget: 'umd'`；Vite 需 `vite-plugin-qiankun`。
+
+**wujie 典型改造**：
+
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+let app
+window.__WUJIE_MOUNT = () => {
+  app = createApp(App)
+  app.mount('#app')
+}
+window.__WUJIE_UNMOUNT = () => {
+  app?.unmount()
+}
+
+if (window.__POWERED_BY_WUJIE__) {
+  window.__WUJIE_MOUNT()
+} else {
+  createApp(App).mount('#app')
+}
+```
+
+主应用侧：
+
+```js
+import WujieVue from 'wujie-vue3'
+
+setupApp({
+  name: 'vue-app',
+  url: 'https://sub.example.com/',
+  exec: true,
+  props: { token: 'xxx' },
+})
+
+<WujieVue name="vue-app" url="https://sub.example.com/" :sync="true" />
+```
+
+**结论**：qiankun 改造点集中在 **构建格式 + 生命周期 + publicPath**；wujie 更偏 **运行时挂载钩子**，子应用构建链路与独立部署几乎一致。
+
+#### 3.6.5 隔离机制与通信
+
+**qiankun 沙箱边界**
+
+- **能隔离**：子应用对 `window.xxx =` 的赋值（ProxySandbox 下）。
+- **不能自动隔离**：`document.addEventListener`、`setInterval`、WebSocket——必须在 `unmount` 里手动清理。
+- **样式**：Shadow DOM 彻底但 Modal 挂 `body` 会失效；前缀方案对 CSS-in-JS 动态类名支持差。
+
+**wujie iframe 边界**
+
+- **能隔离**：完整 JS 运行时、全局变量、CSS 默认不泄漏。
+- **代理成本**：DOM 跨 iframe 同步有性能开销；Canvas、第三方 SDK 偶发兼容问题。
+- **弹窗**：在 iframe 内渲染，层级可能被主应用 UI 遮挡，必要时 `degrade` 降级。
+
+| 方式             | qiankun                                         | wujie                           |
+| ---------------- | ----------------------------------------------- | ------------------------------- |
+| **props 下发**   | `registerMicroApps` 的 `props`                  | `setupApp` / 组件 `props`       |
+| **官方全局状态** | `initGlobalState`                               | 无内置，常用 `bus`              |
+| **事件总线**     | 自行封装（如本项目 `window._QIANKUN_YD.event`） | `$wujie.bus`（`$emit` / `$on`） |
+
+#### 3.6.6 性能、踩坑与选型
+
+**切换子应用**：qiankun 默认 `unmount` 状态丢失；wujie `alive: true` 时 iframe 隐藏保活，返回 **秒开且状态保留**。wujie 代价是 N 个子应用 ≈ N 个 iframe 上下文，需控制同时保活数量。
+
+**常见踩坑**
+
+- qiankun：静态资源 404（publicPath）、Vite dev 白屏（需插件）、Modal 样式丢失（Shadow DOM）。
+- wujie：路由不同步（`sync`）、内存上涨（保活过多）、跨域 cookie（SameSite）。
+
+**选型建议**
+
+| 如果你最看重…                                 | 更倾向  |
+| --------------------------------------------- | ------- |
+| 生态与案例 / Webpack 老项目                   | qiankun |
+| Vite / ESM 开箱即用 / 样式零冲突 / 子应用保活 | wujie   |
+| 内存与长期多应用在线                          | qiankun |
+
+当前 monorepo 主应用（Nuxt 3）通过 **qiankun** 集成 React、Vue2、Vite 三个子应用。若后续全面 Vite 化且需要 Tab 保活，可评估 wujie 试点单个 Vite 子应用，对比接入成本与内存后再决定是否迁移。
+
+两者不是替代关系，而是 **「同窗口沙箱」与「iframe 代理」** 两种隔离哲学的取舍。
 
 ## 技术架构设计
 

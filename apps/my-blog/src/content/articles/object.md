@@ -871,6 +871,84 @@ Array.from(map) // [['a': 1], ['b': 2], ['c': 3]]
 
 也可以通过`set`方法增加或者修改现有的值，`get`方法获取值。
 
+#### WeakMap 与 WeakSet
+
+ES6 在 `Map` / `Set 之外还提供了 **WeakMap** 和 **WeakSet**。名字里的 Weak 指 **弱引用（weak reference）**：集合**不会阻止**键对象被垃圾回收（GC）。
+
+##### 强引用 vs 弱引用
+
+```js
+let obj = { id: 1 }
+const map = new Map()
+map.set(obj, 'meta')
+
+obj = null // Map 仍强引用 obj → obj 不会被 GC，可能造成泄漏
+```
+
+```js
+let obj = { id: 1 }
+const wm = new WeakMap()
+wm.set(obj, 'meta')
+
+obj = null // 除 WeakMap 外无强引用 → GC 后 wm 中条目自动消失
+```
+
+Weak 集合适合「给对象挂元数据、但对象销毁时元数据也应一起消失」的场景，例如 DOM 节点附加数据、框架内部依赖表（Vue 3.4 前的 `targetMap`）等。
+
+##### Map 与 WeakMap 对比
+
+| 维度     | Map                                              | WeakMap                                            |
+| -------- | ------------------------------------------------ | -------------------------------------------------- |
+| 键类型   | 任意（原始值、对象、函数…）                      | **只能是对象**（含数组、函数、Date 等）            |
+| 值类型   | 任意                                             | 任意                                               |
+| 引用方式 | **强引用**键                                     | **弱引用**键                                       |
+| 可遍历   | ✅ `for...of`、`keys()`、`values()`、`entries()` | ❌ 无 `size`，无迭代 API                           |
+| 常用 API | `set` / `get` / `has` / `delete` / `clear`       | `set` / `get` / `has` / `delete`（**无 `clear`**） |
+| 典型用途 | 通用 KV、缓存、计数、索引表                      | 对象私有数据、DOM 元数据、不阻塞 GC 的 side table  |
+
+```js
+const wm = new WeakMap()
+const user = { name: 'alice' }
+wm.set(user, { token: 'xxx' })
+
+wm.get(user) // { token: 'xxx' }
+wm.has(user) // true
+
+// wm.set('key', 1)  // TypeError: Invalid value used as WeakMap key
+```
+
+**何时选 WeakMap？** 键是对象，且你希望「对象没人用了，缓存自动清掉」——不必在 `delete` / `unmount` 里手动 `map.delete(obj)`。
+
+**何时仍用 Map？** 键可能是 string/number，或需要遍历全部条目、知道 `size`、批量 `clear`。
+
+##### Set 与 WeakSet 对比
+
+| 维度     | Set                                         | WeakSet                                               |
+| -------- | ------------------------------------------- | ----------------------------------------------------- |
+| 成员类型 | 任意唯一值                                  | **只能是对象**                                        |
+| 引用方式 | **强引用**成员                              | **弱引用**成员                                        |
+| 可遍历   | ✅                                          | ❌                                                    |
+| 常用 API | `add` / `has` / `delete` / `clear` / `size` | `add` / `has` / `delete`（**无 `clear`、无 `size`**） |
+| 典型用途 | 去重、集合运算                              | 标记「已访问过的对象」，对象销毁后标记自动失效        |
+
+```js
+const ws = new WeakSet()
+const node = document.createElement('div')
+ws.add(node)
+ws.has(node) // true
+// node 从 DOM 移除且无任何引用 → GC 后 ws 不再持有该条目
+```
+
+##### 为何 Weak 结构不可迭代？
+
+规范刻意不提供 `for...of` / `keys()`：若允许遍历，实现就必须**强引用**所有键（或成员）才能列出它们，弱引用的意义就不存在了。因此 WeakMap / WeakSet 只能对**仍存活、且你仍持有引用的那个对象**做 `get` / `has` / `delete`。
+
+##### 小结
+
+- **Map / Set**：通用集合，键或成员可以是任意类型，**强引用**，可遍历，适合业务数据与索引。
+- **WeakMap / WeakSet**：键或成员**只能是对象**，**弱引用**，不可遍历，适合「对象生命周期外的附加状态」，避免内存泄漏。
+- 上文「内置可迭代对象」只列非 weak 结构，正是因为 WeakMap / WeakSet **不属于可迭代对象**。
+
 ### Set
 
 Set 是一组唯一值的集合。生成方式：`new Set()`。

@@ -1,7 +1,7 @@
 ---
 title: '微前端（qiankun）面试题'
-description: 'qiankun 核心原理、JS 沙箱、样式隔离、应用通信、常见坑'
-querys: ['微前端', 'qiankun', 'single-spa', 'Module Federation', '沙箱', 'Shadow DOM']
+description: 'qiankun 核心原理、JS 沙箱、样式隔离、应用通信、与 wujie 对比、常见坑'
+querys: ['微前端', 'qiankun', 'wujie', '无界', 'single-spa', 'Module Federation', '沙箱', 'Shadow DOM']
 ---
 
 ## 微前端（qiankun）面试题
@@ -29,7 +29,7 @@ querys: ['微前端', 'qiankun', 'single-spa', 'Module Federation', '沙箱', 'S
 - **qiankun（single-spa 封装）**：主流方案，基于 HTML Entry + JS 沙箱，接入成本低。缺点：对 Vite（原生 ESM）、Web Components 不够友好；样式隔离需额外配置。
 - **Module Federation (Webpack 5)**：基于运行时远程模块加载，**共享依赖能力强**，偏向"组件级"拆分。缺点：需要统一构建工具链，版本治理复杂。
 - **Web Components**：浏览器原生隔离；但路由、状态管理、跨框架通信仍需自己造轮子。
-- **micro-app / wujie**：`wujie` 基于 `Web Components + iframe`，对 Vite 和样式隔离更友好。
+- **micro-app / wujie**：`wujie` 基于 `Web Components + iframe`，对 Vite 和样式隔离更友好。详见下文「qiankun 与 wujie 对比」。
 
 ### qiankun 的核心实现原理
 
@@ -80,11 +80,49 @@ querys: ['微前端', 'qiankun', 'single-spa', 'Module Federation', '沙箱', 'S
 - **静态资源 404**：子应用相对路径图片被主应用加载时 URL 基于主应用域名，需设置运行时 `__webpack_public_path__` 或绝对 CDN 地址。
 - **keep-alive 缓存**：qiankun 默认切换即 `unmount`，需 `loadMicroApp` 手动管理，或借助 `wujie`/`micro-app` 的 keep-alive 能力。
 
-### qiankun vs single-spa vs Module Federation
+### qiankun vs wujie vs single-spa vs Module Federation
 
 - **single-spa**：只提供路由调度 + 生命周期，HTML 加载、沙箱、样式隔离自己实现。
-- **qiankun**：在 single-spa 基础上封装 HTML Entry、沙箱、样式隔离、预加载，开箱即用。
-- **Module Federation**：解决"依赖共享与细粒度组件共享"，和 qiankun 的"应用级集成"不在同一层，两者可组合使用。
+- **qiankun**：在 single-spa 基础上封装 HTML Entry、Proxy 沙箱、样式隔离、预加载，Webpack 生态最成熟。
+- **wujie**：iframe 运行 JS + Web Component 容器 + DOM 代理，Vite/ESM 与 keep-alive 更友好，内存占用更高。详见 [文章 3.6 节](/articles/qiankun)。
+- **Module Federation**：解决"依赖共享与细粒度组件共享"，和 qiankun / wujie 的"应用级集成"不在同一层，两者可组合使用。
+
+### qiankun 与 wujie 对比
+
+#### 核心区别是什么？
+
+- **qiankun**：基于 single-spa，子应用在 **同一 window** 内通过 **Proxy 沙箱** 运行，用 **HTML Entry** 拉取并执行子应用资源。
+- **wujie**：子应用 JS 在 **iframe 独立 window** 运行，通过 **代理** 把 DOM 同步到主应用 Web Component 容器，隔离更彻底。
+
+#### 为什么 wujie 对 Vite 更友好？
+
+Vite 开发模式输出 **原生 ESM**，qiankun 的 import-html-entry 难以在沙箱里正确劫持执行。wujie 让子应用在 iframe 内跑，iframe 天然支持 ESM，**dev 环境接入成本低**，不必强依赖 `vite-plugin-qiankun`。
+
+#### wujie 的 iframe 方案有什么优缺点？
+
+**优点**：JS/CSS 天然隔离；全局污染风险低；内置 keep-alive；子应用改造少。
+
+**缺点**：每个子应用一个 iframe，**内存占用更高**；DOM 代理有性能开销；部分 Canvas/地图/弹窗场景需降级处理。
+
+#### keep-alive 能力差异？
+
+- **qiankun**：路由切换默认 **unmount**，状态丢失；需 `loadMicroApp` 手动缓存或自研保活。
+- **wujie**：支持 **alive**，切换时隐藏 iframe 而非销毁，表单、滚动位置可保留。
+
+#### 子应用接入改造量谁更大？
+
+**qiankun 更大**：导出生命周期、`__webpack_public_path__`、UMD 构建或 Vite 插件、CORS 等。
+
+**wujie 更小**：多数场景只需 `__WUJIE_MOUNT` / `__WUJIE_UNMOUNT` 钩子，构建产物格式接近独立部署。
+
+#### 什么场景选 qiankun / wujie？
+
+- **qiankun**：Webpack 老项目多、看重生态案例、子应用数量多且不能长期保活、团队已有 qiankun 基建。
+- **wujie**：Vite/ESM 子应用为主、强需求 Tab 保活、样式冲突是核心痛点、可接受 iframe 内存开销。
+
+#### 面试回答模板（30 秒版）
+
+「qiankun 是同窗口 Proxy 沙箱 + HTML Entry，生态成熟，Webpack 接入顺，但 Vite ESM 和保活要额外方案。wujie 用 iframe 跑 JS、代理同步 DOM，隔离和 Vite 友好，内置 keep-alive，但内存更高。我们项目用 qiankun 是因为三个子应用已按 UMD 改造完；如果全面 Vite 化且要 Tab 保活，会试点 wujie。」
 
 ### 微前端性能优化要点
 
