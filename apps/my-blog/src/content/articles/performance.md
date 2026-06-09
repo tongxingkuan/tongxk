@@ -39,24 +39,7 @@ querys: ['性能优化']
 
 参考文章： :c-link{name=性能优化之CSS href=https://blog.csdn.net/qq_36262295/article/details/125874516 target=blank}
 
-内联关键CSS实现：
-
-```bash
-npm i -D critters-webpack-plugin
-```
-
-```js webpack.config.js
-// 一个Webpack插件，用于内嵌关键的CSS并延迟加载其余的CSS
-module.exports = {
-  plugins: [
-    new Critters({
-      // optional configuration (see below)
-    }),
-  ],
-}
-```
-
-options配置参考 :c-link{name=critters href=https://github.com/alan-agius4/critters target=blank}
+内联关键 CSS 可缩短首屏渲染的关键路径，常用工具有 [Critters](https://github.com/GoogleChromeLabs/critters) 与 [Critical](https://github.com/addyosmani/critical)，原理、配置项与选型对比见专题：[关键 CSS 内联：Critters 与 Critical](/articles/critical-css)。
 
 ##### 加载时序控制
 

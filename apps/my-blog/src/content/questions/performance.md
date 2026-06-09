@@ -64,7 +64,7 @@ querys: ['性能优化', 'Web Vitals', 'LCP', 'INP', 'CLS', 'Tree Shaking', 'SSR
 
 - **骨架屏 / 占位图**：减少视觉等待。
 - **SSR / SSG / ISR**：Nuxt、Next 的不同渲染模式；静态内容优先 SSG + CDN。
-- **关键 CSS 内联**（Critical CSS）+ 非关键 CSS 异步加载。
+- **关键 CSS 内联**（Critical CSS）+ 非关键 CSS 异步加载。Critters 静态匹配 DOM 选择器，Critical 用无头浏览器按视口裁剪首屏样式，详见 [关键 CSS 内联：Critters 与 Critical](/articles/critical-css)。
 - **App Shell 模型**：壳先出，数据异步填充。
 - **Hydration 优化**：Islands Architecture（Astro）、Selective Hydration（React 18）、Partial Hydration。
 
