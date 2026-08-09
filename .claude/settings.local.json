@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": ["file_system", "write_files", "read_files", "Bash(npm *)", "Bash(git *)", "Bash(node *)", "Bash(pnpm *)"],
+    "deny": [
+      "Bash(rm *)",
+      "Bash(mv *)",
+      "Bash(cp *)",
+      "Bash(ln *)",
+      "Bash(chmod *)",
+      "Bash(chown *)",
+      "Bash(chgrp *)",
+      "Bash(touch *)"
+    ]
+  },
+  "model": "opus",
+  "autoCompactWindow": 800000
+}

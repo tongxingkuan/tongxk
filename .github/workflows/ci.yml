@@ -1,0 +1,41 @@
+name: my-chats CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/my-chats/**'
+      - '.github/workflows/ci.yml'
+  pull_request:
+    paths:
+      - 'apps/my-chats/**'
+      - '.github/workflows/ci.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: |
+          pnpm --filter my-chats-server exec eslint "src/**/*.ts"
+          pnpm --filter my-chats-web exec eslint .
+
+      - name: Typecheck & Build (server)
+        run: pnpm --filter my-chats-server build
+
+      - name: Typecheck & Build (web)
+        run: pnpm --filter my-chats-web build

@@ -1,0 +1,54 @@
+/* markdown 渲染样式（assistant 气泡内 .md 容器） */
+.md p {
+  margin: 0.5em 0;
+}
+.md p:first-child {
+  margin-top: 0;
+}
+.md p:last-child {
+  margin-bottom: 0;
+}
+.md ul,
+.md ol {
+  margin: 0.5em 0;
+  padding-left: 1.25em;
+}
+.md ul {
+  list-style: disc;
+}
+.md ol {
+  list-style: decimal;
+}
+.md a {
+  color: inherit;
+  text-decoration: underline;
+}
+.md blockquote {
+  margin: 0.5em 0;
+  padding-left: 0.75em;
+  border-left: 3px solid currentColor;
+  opacity: 0.7;
+}
+.md table {
+  border-collapse: collapse;
+}
+.md th,
+.md td {
+  padding: 0.25em 0.5em;
+  border: 1px solid currentColor;
+}
+.md pre {
+  margin: 0.5em 0;
+  overflow-x: auto;
+  border-radius: 0.5em;
+}
+.md pre code {
+  padding: 0;
+  background: transparent;
+}
+.md :not(pre) > code {
+  padding: 0.1em 0.3em;
+  border-radius: 0.25em;
+  font-size: 0.875em;
+  background: rgba(0, 0, 0, 0.08);
+}

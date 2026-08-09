@@ -1,0 +1,13 @@
+{
+  "name": "my-chats",
+  "version": "0.0.0",
+  "private": true,
+  "description": "LLM 对话全栈学习项目（NestJS + Vue + PostgreSQL + Redis）",
+  "scripts": {
+    "dev": "pnpm --parallel --filter my-chats-server --filter my-chats-web dev",
+    "dev:server": "pnpm --filter my-chats-server dev",
+    "dev:web": "pnpm --filter my-chats-web dev",
+    "build": "pnpm --filter my-chats-server build && pnpm --filter my-chats-web build",
+    "lint": "pnpm --filter my-chats-server lint && pnpm --filter my-chats-web lint"
+  }
+}
