@@ -412,6 +412,130 @@ void (async function () {
 })()
 ```
 
+### 树
+
+#### 1. 根据前序和中序遍历构造二叉树
+
+```js
+class TreeNode {
+  constructor(val, left = null, right = null) {
+    this.val = val;
+    this.left = left;
+    this.right = right;
+  }
+}
+
+function buildTree(preOrder, inOrder) {
+  if (!preOrder.length || !inOrder.length) return null;
+  const rootVal = preOrder[0];
+  const root = new TreeNode(rootVal);
+  const rootIndex = inOrder.indexOf(rootVal);
+  root.left = buildTree(
+    preOrder.slice(1, rootIndex + 1);
+    inOrder.slice(0, rootIndex);
+  )
+  root.right = buildTree(
+    preOrder.slice(rootIndex + 1);
+    inOrder.slice(rootIndex + 1);
+  )
+}
+```
+
+#### 2. 获取树的前序、中序、后序遍历
+
+```js
+function preorderTraversal(root) {
+  const res = [];
+  function dfs(node) {
+    if (!node) return
+    res.push(node.val);
+    dfs(node.left);
+    dfs(node.right)
+  }
+  dfs(root);
+  return res;
+}
+
+function inorderTraversal(root) {
+  const res = [];
+  function dfs(node) {
+    if (!node) return;
+    dfs(node.left);
+    res.push(node.val);
+    dfs(node.right);
+  }
+  dfs(root);
+  return res
+}
+
+function postorderTraversal(root) {
+  const res = [];
+  function dfs(node) {
+    if (!node) return
+    dfs(node.left);
+    dfs(node.right);
+    res.push(node.val)
+  }
+  dfs(root);
+  return res;
+}
+```
+
+#### 3. 依赖树剪枝（前序 + 中序重建）
+
+```js
+// 题目：小红用一棵二叉依赖树管理资源。节点给出自身增量，一个节点的完整大小 = 从根到该节点路径上所有增量之和。
+// 若某节点完整大小不大于 0，该节点及其整棵子树都被剪枝（即使子孙完整大小为正，祖先被剪子孙也没了）。
+// 给出互不相同的节点增量所构成的前序遍历和中序遍历，恢复树、完成剪枝，将剩余节点中最大的 K 个完整大小按升序输出。
+// 剩余节点少于 K 个则输出全部；剪枝后为空输出 null。
+// 输入：第一行前序遍历，第二行中序遍历，第三行 K。
+
+// 整体思路：重建 + DFS 带路径和，剪枝即「提前 return」
+// 1. 增量互不相同 → 值可作唯一标识，用 Map 记录每个值在中序中的下标，前序首元素即根，切分左右子树递归重建
+// 2. 剪枝不用二次遍历：DFS 时把「根到父节点的路径和 sum」作为参数传下去，
+//    当前节点 full = sum + 增量 ≤ 0 就直接 return，整棵子树自然不会被访问——这正是题目要求的剪枝语义
+// 3. 收集所有存活节点的 full，排序后取最大的 min(K, n) 个，再按升序输出
+
+const rl = require('readline').createInterface({ input: process.stdin })
+var iter = rl[Symbol.asyncIterator]()
+const readline = async () => (await iter.next()).value
+
+void (async function () {
+  const pre = (await readline()).split(' ').map(Number)
+  const inOrder = (await readline()).split(' ').map(Number)
+  const K = Number(await readline())
+
+  // 值 → 中序下标，配合「互不相同」题设，把重建降到 O(n)
+  const idxOf = new Map()
+  for (let i = 0; i < inOrder.length; i++) {
+    idxOf.set(inOrder[i], i)
+  }
+
+  const sizes = []
+  // pre[l1..r1] 与 in[l2..r2] 描述同一棵子树，sum 为根到该子树根的父节点路径和
+  function build(l1, r1, l2, r2, sum) {
+    if (l1 > r1) return
+    const full = sum + pre[l1]
+    // 剪枝：完整大小不大于 0，丢弃该节点及整棵子树
+    if (full <= 0) return
+    sizes.push(full)
+    const mid = idxOf.get(pre[l1])
+    const leftLen = mid - l2
+    build(l1 + 1, l1 + leftLen, l2, mid - 1, full)
+    build(l1 + leftLen + 1, r1, mid + 1, r2, full)
+  }
+  build(0, pre.length - 1, 0, inOrder.length - 1, 0)
+
+  if (sizes.length === 0) {
+    console.log('null')
+  } else {
+    sizes.sort((a, b) => a - b)
+    const k = Math.min(K, sizes.length)
+    console.log(sizes.slice(-k).join(' '))
+  }
+})()
+```
+
 ### ES6新特性
 
 #### 1. 将数字转换为千分位格式
