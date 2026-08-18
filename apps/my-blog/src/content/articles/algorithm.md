@@ -289,6 +289,129 @@ void (async function () {
 })();
 ```
 
+### 贪心
+
+#### 1. 信号站覆盖问题
+
+```js
+// 题目：一条直线上有 N 个目标点，小红可以在任意一个目标点放置信号站，覆盖与该位置距离不超过 M 的所有目标点，
+// 求覆盖全部目标点最少需要多少个信号站。多个目标点可以位于同一位置。
+// 输入：第一行 N、M，第二行 N 个目标点位置。样例：N=5、M=2，点为 1 3 6 8 10 → 输出 2（站放在 3 和 8）
+
+// 整体思路：排序 + 贪心（经典「Saruman's Army」模型）
+// 1. 站只能放在目标点上。排序后看最左未覆盖点 x：能覆盖 x 的站只能位于 [x, x+M] 内的目标点
+//    （x 左侧的点均已覆盖，无需再为它们考虑设站）
+// 2. 站的位置 p 越靠右，覆盖区间 [p-M, p+M] 的右端越远，而左端 p-M ≤ x 依然罩得住 x
+//    → 把站放在 [x, x+M] 内最右侧的目标点上，新覆盖的点不会少于任何其他放法（交换论证可证最优）
+// 3. 跳过该站已覆盖的点（位置 ≤ p+M），对下一个未覆盖点重复上述过程，直到覆盖所有点
+
+const rl = require('readline').createInterface({ input: process.stdin })
+var iter = rl[Symbol.asyncIterator]()
+const readline = async () => (await iter.next()).value
+
+void (async function () {
+  const [n, M] = (await readline()).split(' ').map(Number)
+  const points = (await readline()).split(' ').map(Number).sort((a, b) => a - b)
+
+  let i = 0
+  let count = 0
+  while (i < n) {
+    // x：当前最左未覆盖点，放站的候选范围是 [x, x+M]
+    const x = points[i]
+    // 第一轮右移：越过所有 ≤ x+M 的点，i-1 即 [x, x+M] 内最右的目标点，站放这里
+    while (i < n && points[i] <= x + M) {
+      i++
+    }
+    const p = points[i - 1]
+    count++
+    // 第二轮右移：跳过该站覆盖的所有点（与 p 距离不超过 M）
+    while (i < n && points[i] <= p + M) {
+      i++
+    }
+  }
+  console.log(count)
+})()
+```
+
+#### 2. 最少跳跃次数
+
+```js
+// 给出一个非负整数数组，每个元素代表你在该位置最大可以向右跳跃的步数。初始位置在数组的第一个下标（索引 0）处。目标是用最少的跳跃次数到达数组的最后一个位置。假设你总是可以到达最后一个位置。
+// 输入描述：第一行输入一个整数 N ，表示数组长度。第二行输入 N 个以空格分隔的非负整数，表示每个位置的最大跳跃距离。
+// 输出描述：输出一个整数，表示到达最后一个位置所需的最少跳跃次数。
+
+const rl = require('readline').createInterface({ input: process.stdin })
+var iter = rl[Symbol.asyncIterator]()
+const readline = async () => (await iter.next()).value
+
+void (async function () {
+  const n = parseInt(await readline());
+  const arr = (await readline()).split(' ').map(Number);
+  if (n <= 1) {
+    console.log(0);
+    return;
+  }
+
+  let maxReach = 0;
+  let currentEnd = 0;
+  let steps = 0;
+
+  for (let i = 0; i < n - 1; i++) {
+    maxReach = Math.max(maxReach, i + arr[i]);
+
+    if (i === currentEnd) {
+      steps++;
+      currentEnd = maxReach;
+
+      if (currentEnd >= n - 1) {
+        break;
+      }
+    }
+    console.log(steps);
+  }
+})()
+```
+
+#### 3. 活动安排问题
+
+```js
+// 题目：小红负责一块活动场地，候选活动各自占用一个半开时间段 [si, ei)。同一时刻场地最多安排一个活动；
+// 若一个活动的结束时间等于另一个活动的开始时间，两者可以连续举行。求一天最多能安排多少个活动。
+// 输入：第一行 n，接下来 n 行每行 si ei。样例：4 个活动 1 2 / 2 3 / 3 4 / 2 5 → 输出 3（选 [1,2) [2,3) [3,4) 连续举行）
+
+// 整体思路：按结束时间排序 + 贪心（经典「活动安排」模型）
+// 1. 半开区间 [s, e) 且「结束=开始可连续」→ 下一个活动的选中条件是 s >= lastEnd（写成 s > lastEnd 会漏掉首尾相接的方案）
+// 2. 每次优先选「结束最早」的活动：它给后续活动留出的剩余时间最多，选它不会比选其他更差（交换论证可证最优）
+// 3. 排序后扫一遍，能接上就选并更新 lastEnd，计数即为答案
+
+const rl = require('readline').createInterface({ input: process.stdin })
+var iter = rl[Symbol.asyncIterator]()
+const readline = async () => (await iter.next()).value
+
+void (async function () {
+  const n = Number(await readline())
+  const acts = []
+  for (let i = 0; i < n; i++) {
+    const [s, e] = (await readline()).split(' ').map(Number)
+    acts.push([s, e])
+  }
+
+  // 按结束时间升序；结束相同再按开始时间升序（保证 [3,5) 排在 [5,5) 前，零长度活动不挤掉更早开始的活动）
+  acts.sort((a, b) => a[1] - b[1] || a[0] - b[0])
+
+  let count = 0
+  let lastEnd = -Infinity
+  for (const [s, e] of acts) {
+    // s === lastEnd 时上一场恰好结束，场地已空，可以直接开始
+    if (s >= lastEnd) {
+      count++
+      lastEnd = e
+    }
+  }
+  console.log(count)
+})()
+```
+
 ### ES6新特性
 
 #### 1. 将数字转换为千分位格式
